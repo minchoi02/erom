@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AdmgrMember">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrMemberVO" type="egovframework.admgrMember.service.AdmgrMemberVO"/>
+
+	<!-- 회원목록 불러오기 -->
+	<select id="get_member_list" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				USER_JOIN_FL, 
+				USER_SEQ, 
+				USER_ID, 
+				USER_NM, 
+				USER_LEVEL, 
+				USER_HP, 
+				USER_ST, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(LAST_LOGIN_DT,1,19) as LAST_LOGIN_DT 
+			from base_member_tb
+			where 1 
+		]]>
+		<isNotEmpty property="user_level"  prepend="AND">
+		<![CDATA[
+			USER_LEVEL = #user_level#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="user_nm">
+			<![CDATA[
+				USER_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_id">
+			<![CDATA[
+				USER_ID like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_hp">
+			<![CDATA[
+				USER_HP like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+			order by REG_DT desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 회원목록 총 카운터 불러오기 -->
+	<select id="get_member_list_cnt" parameterClass="AdmgrMemberVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_member_tb 
+			where 1 
+		]]>
+		<isNotEmpty property="user_level"  prepend="AND">
+		<![CDATA[
+			USER_LEVEL = #user_level#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="user_nm">
+			<![CDATA[
+				USER_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_id">
+			<![CDATA[
+				USER_ID like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_hp">
+			<![CDATA[
+				USER_HP like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>	
+	</select>
+
+	<!-- 모달용 회원목록 불러오기 -->
+	<select id="get_modal_member_list" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				USER_JOIN_FL, 
+				USER_SEQ, 
+				USER_ID,
+				USER_NM, 
+				USER_HP, 
+				USER_EMAIL, 
+				substr(REG_DT,1,10) as REG_DT
+			from base_member_tb
+			where 1 
+			and USER_ST = 'Y'
+		]]>
+		<isNotEmpty property="user_level"  prepend="AND">
+		<![CDATA[
+			USER_LEVEL = #user_level#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="modalsearchKeyword">
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_nm">
+			<![CDATA[
+				USER_NM like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_id">
+			<![CDATA[
+				USER_ID like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_hp">
+			<![CDATA[
+				USER_HP like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+			order by REG_DT desc
+		]]>
+	</select>
+	
+	<!-- 회원목록 총 카운터 불러오기 -->
+	<select id="get_modal_member_list_cnt" parameterClass="AdmgrMemberVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_member_tb 
+			where 1 
+			and USER_ST = 'Y'
+		]]>
+		<isNotEmpty property="user_level"  prepend="AND">
+		<![CDATA[
+			USER_LEVEL = #user_level#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="modalsearchKeyword">
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_nm">
+			<![CDATA[
+				USER_NM like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_id">
+			<![CDATA[
+				USER_ID like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="modalsearchKey" compareValue="user_hp">
+			<![CDATA[
+				USER_HP like CONCAT('%',#modalsearchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+		
+		
+	<!-- 회원로그인용. -->
+	<select id="get_is_member_data" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				USER_SEQ, 
+				USER_ID, 
+				USER_NM, 
+				USER_PWD, 
+				USER_LEVEL 
+			from base_member_tb  
+			where USER_ID  = #user_id# and USER_PWD = #user_pwd#
+		]]>
+	<isNotEmpty property="user_level">
+		<![CDATA[
+			and USER_LEVEL >= #user_level#
+		]]>
+	</isNotEmpty>
+	</select>
+
+	<!-- 회원아디가 중복인지 체크한다. -->
+	<select id="get_is_check_id_cnt" parameterClass="AdmgrMemberVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_member_tb  
+			where USER_ID like CONCAT('%',#user_id#,'%')
+		]]>
+	</select>
+
+	<!-- 회원정보호출용.: seq -->
+	<select id="get_member_info" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				USER_SEQ, 
+				USER_JOIN_FL, 
+				USER_ID, 
+				USER_PWD, 
+				USER_NM, 
+				USER_LEVEL, 
+				USER_SEX_FL, 
+				USER_TEL, 
+				USER_HP, 
+				USER_EMAIL, 
+				USER_ST, 
+				USER_TOTAL_MILEAGE, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT, 
+				substr(WITHDRAW_DT,1,19) as WITHDRAW_DT,  
+				substr(DENY_DT,1,19) as DENY_DT, 
+				substr(LAST_LOGIN_DT,1,19) as LAST_LOGIN_DT, 
+				NEXT_CHANGE_PWD_DT, 
+				DEVICE_TOKEN,
+				USER_ADMIN_MEMO
+			from base_member_tb  
+			where USER_SEQ = #user_seq#
+		]]>
+	</select>
+	
+	<!-- 회원정보호출용.: id -->
+	<select id="get_member_id_info" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				USER_SEQ, 
+				USER_JOIN_FL, 
+				USER_ID, 
+				USER_PWD, 
+				USER_NM, 
+				USER_LEVEL, 
+				USER_SEX_FL, 
+				USER_TEL, 
+				USER_HP, 
+				USER_EMAIL, 
+				USER_ST, 
+				USER_TOTAL_MILEAGE, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT, 
+				substr(WITHDRAW_DT,1,19) as WITHDRAW_DT,  
+				substr(DENY_DT,1,19) as DENY_DT, 
+				substr(LAST_LOGIN_DT,1,19) as LAST_LOGIN_DT, 
+				NEXT_CHANGE_PWD_DT, 
+				USER_ADMIN_MEMO
+			from base_member_tb  
+			where USER_ID = #user_id#
+		]]>
+	</select>
+	
+	<!-- 회원가입-->
+	<insert id="insert_member" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			insert into base_member_tb 
+				(USER_JOIN_FL, USER_ID, USER_PWD, USER_NM, USER_LEVEL, USER_HP, USER_EMAIL, USER_ST, USER_TOTAL_MILEAGE, REG_DT, MOD_DT, USER_ADMIN_MEMO)
+			values
+				(#user_join_fl#, #user_id#, #user_pwd#, #user_nm#, #user_level#, #user_hp#, #user_email#, #user_st#, 0, now(), now(), #user_admin_memo# );
+		]]>
+	</insert>
+	
+	<!-- 회원정보수정 -->
+	<update id="update_member" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			update base_member_tb set
+		]]>
+		<isNotEmpty property="user_pwd">
+		<![CDATA[
+			USER_PWD = #user_pwd# ,
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			USER_NM = #user_nm# ,
+			USER_LEVEL = #user_level# ,
+			USER_HP = #user_hp# ,
+			USER_EMAIL = #user_email# ,
+			MOD_DT = now() ,
+			USER_ADMIN_MEMO = #user_admin_memo#
+			where USER_SEQ = #user_seq#
+		]]>
+	</update>
+
+	<!-- 마지막로그인 저장 -->
+	<update id="last_login_member" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			update base_member_tb set
+			LAST_LOGIN_DT = now()
+			where USER_ID= #user_id#
+		]]>
+	</update>
+
+	<!-- 마지막로그인 로그 저장 -->
+	<insert id="log_login_member" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			insert into base_log_login_tb
+			(USER_ID, REG_DT) 
+			values 
+			(#user_id#, now())
+		]]>
+	</insert>
+
+	<!-- 회원주소록 목록 가져온다. -->
+	<select id="get_member_addr_list" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				ADDR_SEQ,
+				USER_ID, 
+				ADDR_DEFAULT, 
+				ADDR_NM,  
+				ADDR_HP, 
+				ADDR_EMAIL, 
+				ADDR_ZIP, ADDR_1, 
+				ADDR_2, 
+				DEL_ST, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT
+			from base_addr_tb  
+			where USER_ID = #user_id#
+		]]>
+	</select>
+
+	<!-- 개별 회원마일리지  총합을 가져온다. -->
+	<select id="get_member_mileage_total" parameterClass="AdmgrMemberVO" resultClass="int">
+		<![CDATA[
+			select 
+				IFNULL(sum(USER_MILEAGE),0) as total_mileage 
+			from base_mileage_tb  
+			where USER_ID = #user_id#
+		]]>
+	</select>
+
+
+	<!-- 회원마일리지  갯수을 가져온다. -->
+	<select id="get_member_mileage_cnt" parameterClass="AdmgrMemberVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) as total_cnt
+			from base_mileage_tb 
+			LEFT JOIN base_member_tb ON 
+			base_mileage_tb.user_id = base_member_tb.user_id
+		]]>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="user_id">
+			<![CDATA[
+				base_member_tb.USER_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_nm">
+			<![CDATA[
+				base_member_tb.USER_ID like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_hp">
+			<![CDATA[
+				base_member_tb.USER_HP like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>	
+		<![CDATA[
+			order by base_mileage_tb.MILEAGE_SEQ desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 회원마일리지  목록을 가져온다. -->
+	<select id="get_member_mileage_list" parameterClass="AdmgrMemberVO" resultClass="AdmgrMemberVO">
+		<![CDATA[
+			select 
+				base_mileage_tb.MILEAGE_SEQ, 
+				base_mileage_tb.MILEAGE_SEQ as this_seq, 
+				base_mileage_tb.USER_ID, 
+				base_mileage_tb.USER_ID AS this_user_id, 
+				base_mileage_tb.USER_MILEAGE_SET, 
+				IFNULL(base_mileage_tb.USER_MILEAGE,0) as USER_MILEAGE, 
+				base_mileage_tb.USER_MILEAGE_CONTENT, 
+				substr(base_mileage_tb.REG_DT,1,19) as REG_DT, 
+				base_member_tb.USER_NM,
+				base_member_tb.USER_TOTAL_MILEAGE,
+				(select IFNULL(sum(base_mileage_tb.USER_MILEAGE),0) from base_mileage_tb where base_mileage_tb.USER_ID = this_user_id and base_mileage_tb.MILEAGE_SEQ <= this_seq) as user_mileage_step_sum
+			from base_mileage_tb  LEFT JOIN base_member_tb ON base_mileage_tb.user_id = base_member_tb.user_id
+			where 1 
+		]]>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="user_id">
+			<![CDATA[
+				base_member_tb.USER_ID like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_nm">
+			<![CDATA[
+				base_member_tb.USER_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="user_hp">
+			<![CDATA[
+				base_member_tb.USER_HP like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>	
+		<![CDATA[
+			order by base_mileage_tb.MILEAGE_SEQ desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<!-- 회원마일리지 등록 -->
+	<insert id="insert_mileage" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			insert into base_mileage_tb 
+				(USER_ID, USER_MILEAGE_SET, USER_MILEAGE, USER_MILEAGE_CONTENT, REG_DT)
+			values
+				(#user_id#, #user_mileage_set#, #user_mileage#, #user_mileage_content#, now());
+		]]>
+	</insert>
+	
+	<!-- 회원마일리지 플러스 수정 -->
+	<update id="update_user_mileage" parameterClass="AdmgrMemberVO" >
+		<![CDATA[
+			update base_member_tb set
+				USER_TOTAL_MILEAGE = USER_TOTAL_MILEAGE + #user_mileage#
+			where user_id = #user_id#
+		]]>
+	</update>
+	
+
+	
+
+
+	
+</sqlMap>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd" >
+<sqlMapConfig>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_Common_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrMain_SQL_Mysql.xml"/>		
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrConfig_SQL_Mysql.xml"/>		
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrSystem_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrMember_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrMarketing_SQL_Mysql.xml"/>		
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrBoard_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrStore_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrProduct_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrOrder_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrExtention_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_AdmgrStatistics_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourSearch_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourShop_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourOrder_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourMember_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourBoard_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/scmtour/Base_ScmtourExtention_SQL_Mysql.xml"/>
+</sqlMapConfig>

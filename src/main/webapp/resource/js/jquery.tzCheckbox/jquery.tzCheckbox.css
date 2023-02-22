@@ -1,0 +1,83 @@
+.tzCheckBox{
+	background:url('../../img/checkbox.jpg') no-repeat right bottom;
+	display:inline-block;
+	min-width:25px;
+	height:25px;
+	white-space:nowrap;
+	position:relative;
+	cursor:pointer;
+	margin-left:0px;
+	font-size:0px;
+	top:5px;
+	margin-right:5px;
+}
+
+.tzCheckBox.checked{
+	background-position:top left;
+	margin:0 5px 0 0;
+}
+
+.tzCheckBox .tzCBContent{
+	color: white;
+	line-height: 25x;
+	padding-right: 0px;
+	text-align: right;
+}
+
+.tzCheckBox.checked .tzCBContent{
+	text-align:left;
+	padding:0 0 0 0px;
+}
+
+.tzCBPart{
+	background:url('../../img/checkbox.jpg') no-repeat right top;
+	display:inline-block;
+	min-width:25px;
+	height:25px;
+	white-space:nowrap;
+	position:relative;
+	cursor:pointer;
+	margin-left:0px;
+	font-size:0px;
+}
+
+.tzCheckBox.checked .tzCBPart{
+	background-position:right bottom;
+	margin:0 0px 0 0;
+}
+
+
+@media screen and (max-width:1024px) {
+.tzCheckBox{
+	background:url('../../img/checkbox_m.jpg') no-repeat right bottom;
+	min-width:18px;
+	height:18px;
+	top:5px;
+	margin-right:5px;
+}
+
+.tzCheckBox.checked{
+	background-position:top left;
+	margin:0 5px 0 0;
+}
+
+.tzCheckBox .tzCBContent{
+	color: white;
+	line-height: 18x;
+	padding-right: 0px;
+	text-align: right;
+}
+
+.tzCheckBox.checked .tzCBContent{
+	text-align:left;
+	padding:0 0 0 0px;
+}
+
+.tzCBPart{
+	background:url('../../img/checkbox_m.jpg') no-repeat right top;
+	min-width:18px;
+	height:18px;
+	
+}
+
+}

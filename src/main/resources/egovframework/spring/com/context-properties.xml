@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+    
+    <!-- 프로퍼티 정보 설정 -->
+    <bean name="propertiesService" class="egovframework.rte.fdl.property.impl.EgovPropertyServiceImpl" destroy-method="destroy">
+        <property name="properties">
+            <map>
+                <entry key="pageUnit" value="10"/>
+                <entry key="pageSize" value="10"/>
+                <entry key="posblAtchFileSize" value="5242880"/>
+                
+                <!-- 
+                <entry key="Globals.fileStorePath" value="c:/webapps/datav2/store/"/>
+				<entry key="Globals.fileBasePath" value="c:/webapps/datav2/base/"/>
+				<entry key="Globals.fileEditorPath" value="c:/webapps/datav2/editor/"/>
+				<entry key="Globals.fileItemPath" value="c:/webapps/datav2/item/"/>
+				<entry key="Globals.fileBannerPath" value="c:/webapps/datav2/banner/"/>
+				<entry key="Globals.fileSlidePath" value="c:/webapps/datav2/slide/"/>
+				<entry key="Globals.fileEventPath" value="c:/webapps/datav2/event/"/>
+				<entry key="Globals.filePopupPath" value="c:/webapps/datav2/popup/"/>
+				<entry key="Globals.fileDesignPath" value="c:/webapps/datav2/design/"/>
+				<entry key="Globals.fileBbsPath" value="c:/webapps/datav2/bbs/"/>
+				<entry key="Globals.fileMoviePath" value="c:/webapps/datav2/movie/"/>
+				<entry key="Globals.fileEtcPath" value="c:/webapps/datav2/files/"/>
+				 -->
+                
+                <entry key="Globals.fileStorePath" value="/datav2/store/"/>
+				<entry key="Globals.fileBasePath" value="/datav2/base/"/>
+				<entry key="Globals.fileEditorPath" value="/datav2/editor/"/>
+				<entry key="Globals.fileItemPath" value="/datav2/item/"/>
+				<entry key="Globals.fileBannerPath" value="/datav2/banner/"/>
+				<entry key="Globals.fileSlidePath" value="/datav2/slide/"/>
+				<entry key="Globals.fileEventPath" value="/datav2/event/"/>
+				<entry key="Globals.filePopupPath" value="/datav2/popup/"/>
+				<entry key="Globals.fileDesignPath" value="/datav2/design/"/>
+				<entry key="Globals.fileBbsPath" value="/datav2/bbs"/>
+				<entry key="Globals.fileMoviePath" value="/datav2/movie/"/>
+				<entry key="Globals.fileEtcPath" value="/datav2/files"/>
+                
+                <entry key="Globals.addedOptions" value="false"/>
+            </map>
+        </property>
+    </bean>
+</beans>    

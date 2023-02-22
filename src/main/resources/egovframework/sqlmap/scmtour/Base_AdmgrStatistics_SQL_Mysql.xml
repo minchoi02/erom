@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AdmgrStatistics">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrStatisticsVO" type="egovframework.admgrStatistics.service.AdmgrStatisticsVO"/>
+
+	 
+	<select id="get_keywords_list" parameterClass="AdmgrStatisticsVO" resultClass="AdmgrStatisticsVO">
+		<![CDATA[
+		select 
+			COUNT(KEYWORDS) AS cnt, KEYWORDS 
+		from base_log_keyword_date_tb
+		where 1
+			and REG_DT LIKE CONCAT(#reg_dt#,'%')
+			and KEYWORDS != ''
+		group by KEYWORDS
+		order by cnt DESC
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	<select id="get_keywords_list_cnt" parameterClass="AdmgrStatisticsVO" resultClass="int">
+		<![CDATA[
+		select 
+			COUNT(DISTINCT(KEYWORDS))
+		from base_log_keyword_date_tb
+		where 1
+			and REG_DT LIKE CONCAT(#reg_dt#,'%')
+			and KEYWORDS != ''
+		]]>
+	</select>
+	
+	<select id="get_sale_all_cnt" parameterClass="AdmgrStatisticsVO" resultClass="int">
+		<![CDATA[
+		select 
+			COUNT(*)
+		FROM base_order_prod_detail_tb od, base_order_tb om
+		WHERE 1
+			AND om.ORDER_ID = od.OD_ORDER_ID
+			AND om.REG_DT LIKE CONCAT(#reg_dt#,'%')
+			AND od.OD_ORDER_STAT IN ('PAYMENT', 'COMPLETE', 'TRANSFER')
+		]]>
+	</select>
+	<select id="get_sale_category_cnt" parameterClass="AdmgrStatisticsVO" resultClass="int">
+		<![CDATA[
+		SELECT 
+			COUNT(*)
+		FROM base_order_prod_detail_tb od, base_order_tb om
+		WHERE 1
+			AND om.ORDER_ID = od.OD_ORDER_ID
+			AND od.OD_STORE_CATEGORY = #od_store_category#
+			AND om.REG_DT LIKE CONCAT(#reg_dt#,'%')
+			AND OD_ORDER_STAT IN ('PAYMENT', 'COMPLETE', 'TRANSFER')
+		]]>
+	</select>
+	
+	<select id="get_sale_all_list" parameterClass="AdmgrStatisticsVO" resultClass="AdmgrStatisticsVO">
+		<![CDATA[
+		SELECT 
+			COUNT(*) as cnt,
+			od.OD_PROD_NM
+		FROM base_order_prod_detail_tb od, base_order_tb om
+		WHERE 1
+			AND om.ORDER_ID = od.OD_ORDER_ID
+			and om.REG_DT LIKE CONCAT(#reg_dt#,'%')
+			AND od.OD_ORDER_STAT IN ('PAYMENT', 'COMPLETE', 'TRANSFER')
+		group by od.OD_PROD_NM
+		order by cnt desc
+		limit 10
+		]]>
+	</select>
+	<select id="get_sale_category_list" parameterClass="AdmgrStatisticsVO" resultClass="AdmgrStatisticsVO">
+		<![CDATA[
+		SELECT 
+			COUNT(*) as cnt,
+			od.OD_PROD_NM
+		FROM base_order_prod_detail_tb od, base_order_tb om
+		WHERE 1
+			AND om.ORDER_ID = od.OD_ORDER_ID
+			AND od.OD_STORE_CATEGORY = #od_store_category#
+			and om.REG_DT LIKE CONCAT(#reg_dt#,'%')
+			AND od.OD_ORDER_STAT IN ('PAYMENT', 'COMPLETE', 'TRANSFER')
+		group by od.OD_PROD_NM			
+		order by cnt desc	
+		limit 10
+		]]>
+	</select>
+	
+	<select id="get_conn_cnt" parameterClass="AdmgrStatisticsVO" resultClass="int">
+		<![CDATA[
+		SELECT 
+			COUNT(*)
+		FROM base_log_user_agnet_tb
+		WHERE 1
+			and REG_DT LIKE CONCAT(#reg_dt#,'%')
+		]]>
+	</select>
+	
+	
+</sqlMap>

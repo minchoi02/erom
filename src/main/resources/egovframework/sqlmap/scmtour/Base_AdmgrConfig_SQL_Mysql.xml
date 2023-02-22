@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseSettingConfig">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrConfigVO" type="egovframework.admgrConfig.service.AdmgrConfigVO"/>
+
+	<select id="get_base_config" parameterClass="AdmgrConfigVO" resultClass="AdmgrConfigVO">
+		<![CDATA[
+		select 
+			SITE_NM,
+			SITE_USE_RULE,
+			SITE_PERSONAL,
+			SITE_AGREE_PLACE,
+			SITE_CUSTOMER_SCRIPT,
+			SITE_EMAIL,
+			SITE_TEL,
+			SITE_FAX,
+			SITE_ZIP,
+			SITE_ADDR_1,
+			SITE_ADDR_2,
+			SITE_CEO_NM,
+			SITE_COMPANY_NM,
+			SITE_COMPANY_NUMBER,
+			SITE_COMPANY_TO_NUMBER,
+			SITE_SAIL_AUTH_NUMBER,
+			SITE_INFO_ADM_NM,
+			SITE_INFO_ADM_EMAIL,
+			PAY_USE_BANK_ST,
+			PAY_USE_CARD_ST,
+			PAY_BANK_NM,
+			PAY_BANK_NUMBER,
+			PAY_BANK_USER,
+			PAY_CARD_CALC,
+			PAY_REAL_CALC,
+			PAY_VIRT_CALC,
+			PAY_PG_ADM_URL,
+			PAY_PG_ID,
+			PAY_PG_PWD,
+			SNS_USE_LOGIN_ST,
+			SNS_NAVER_CID,
+			SNS_NAVER_CKEY,
+			SNS_DAUM_RAKEY,
+			SNS_DAUM_JSKEY,
+			SNS_DAUM_CKEY,
+			SNS_FACEBOOK_CID,
+			SNS_FACEBOOK_CKEY,
+			SNS_APPLE_CID,
+			SNS_APPLE_CKEY,
+			CALC_TRAVEL,
+			CALC_HOUSE,
+			CALC_FOOD,
+			CALC_MARKET,
+			MILEAGE_JOIN_USE_ST,
+			MILEAGE_JOIN,
+			MILEAGE_ORDER_USE_ST,
+			MILEAGE_ORDER,
+			INFO_1,
+			INFO_2,
+			INFO_3,
+			INFO_4,
+			INFO_5,
+			TIME_LIMIT,
+			SMS_SEND,
+			SMS_NO1,
+			SMS_NO2,
+			TRACKING_KEY
+		from base_config_default_tb
+		]]>
+	</select>
+	
+	<!-- 베이스설정 -->
+	<update id="base_config_update" parameterClass="AdmgrConfigVO" >
+		<![CDATA[
+		update base_config_default_tb set
+		SITE_NM = #site_nm#,
+		SITE_USE_RULE = #site_use_rule#,
+		SITE_PERSONAL = #site_personal#,
+		SITE_AGREE_PLACE = #site_agree_place#,
+		SITE_CUSTOMER_SCRIPT = #site_customer_script#,
+		SITE_EMAIL = #site_email#,
+		SITE_TEL = #site_tel#,
+		SITE_FAX = #site_fax#,
+		SITE_ZIP = #site_zip#,
+		SITE_ADDR_1 = #site_addr_1#,
+		SITE_ADDR_2 = #site_addr_2#,
+		SITE_CEO_NM = #site_ceo_nm#,
+		SITE_COMPANY_NM = #site_company_nm#,
+		SITE_COMPANY_NUMBER = #site_company_number#,
+		SITE_COMPANY_TO_NUMBER = #site_company_to_number#,
+		SITE_SAIL_AUTH_NUMBER = #site_sail_auth_number#,
+		SITE_INFO_ADM_NM = #site_info_adm_nm#,
+		SITE_INFO_ADM_EMAIL = #site_info_adm_email#,
+		PAY_USE_BANK_ST = #pay_use_bank_st#,
+		PAY_USE_CARD_ST = #pay_use_card_st#,
+		PAY_BANK_NM = #pay_bank_nm#,
+		PAY_BANK_NUMBER = #pay_bank_number#,
+		PAY_BANK_USER = #pay_bank_user#,
+		PAY_CARD_CALC = #pay_card_calc#,
+		PAY_REAL_CALC = #pay_real_calc#,
+		PAY_VIRT_CALC = #pay_virt_calc#,
+		PAY_PG_ADM_URL = #pay_pg_adm_url#,
+		PAY_PG_ID = #pay_pg_id#,
+		PAY_PG_PWD = #pay_pg_pwd#,
+		SNS_USE_LOGIN_ST = #sns_use_login_st#,
+		SNS_NAVER_CID = #sns_naver_cid#,
+		SNS_NAVER_CKEY = #sns_naver_ckey#,
+		SNS_DAUM_RAKEY = #sns_daum_rakey#,
+		SNS_DAUM_JSKEY = #sns_daum_jskey#,
+		SNS_DAUM_CKEY = #sns_daum_ckey#,
+		SNS_FACEBOOK_CID = #sns_facebook_cid#,
+		SNS_FACEBOOK_CKEY = #sns_facebook_ckey#,
+		SNS_APPLE_CID = #sns_apple_cid#,
+		SNS_APPLE_CKEY = #sns_apple_ckey#,
+		CALC_TRAVEL = #calc_travel#,
+		CALC_HOUSE = #calc_house#,
+		CALC_FOOD = #calc_food#,
+		CALC_MARKET = #calc_market#,
+		MILEAGE_JOIN_USE_ST = #mileage_join_use_st#,
+		MILEAGE_JOIN = #mileage_join#,
+		MILEAGE_ORDER_USE_ST = #mileage_order_use_st#,
+		MILEAGE_ORDER = #mileage_order#,
+		INFO_1 = #info_1#,
+		INFO_2 = #info_2#,
+		INFO_3 = #info_3#,
+		INFO_4 = #info_4#,
+		INFO_5 = #info_5#,		
+		TIME_LIMIT = #time_limit#,
+		SMS_SEND = #sms_send#,
+		SMS_NO1 = #sms_no1#,
+		SMS_NO2 = #sms_no2#,
+		TRACKING_KEY = #tracking_key#
+		]]>
+	</update>
+	
+	<!-- 팝업목록  -->
+	<select id="get_popup_list" parameterClass="AdmgrConfigVO" resultClass="AdmgrConfigVO" >
+		<![CDATA[
+			select 
+				POPUP_SEQ, 
+				POPUP_NM, 
+				POPUP_TOP, 
+				POPUP_LEFT, 
+				POPUP_WIDTH, 
+				POPUP_HEIGHT, 
+				POPUP_CONTENT, 
+				substr(POPUP_ST_DT,1,16) as POPUP_ST_DT, 
+				substr(POPUP_ED_DT,1,16) as POPUP_ED_DT, 
+				POPUP_USE_ST, 
+				POPUP_HIT_CNT, 
+				substr(REG_DT,1,16) as REG_DT, 
+				substr(MOD_DT,1,16) as MOD_DT,
+				CASE
+					WHEN (NOW() > POPUP_ED_DT) THEN 'E'
+					WHEN (NOW() < POPUP_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as POPUP_STATUS
+			from base_popup_tb
+			where 1 
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			POPUP_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			order by POPUP_ED_DT desc, REG_DT DESC
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 팝업목록 갯수 -->
+	<select id="get_popup_list_cnt" parameterClass="AdmgrConfigVO" resultClass="int" >
+		<![CDATA[
+			select 
+				count(*) 
+			from base_popup_tb
+			where 1 
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			POPUP_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 팝업상세 -->
+	<select id="get_popup_info" parameterClass="AdmgrConfigVO" resultClass="AdmgrConfigVO" >
+		<![CDATA[
+			select 
+				POPUP_SEQ, 
+				POPUP_NM, 
+				POPUP_TOP, 
+				POPUP_LEFT, 
+				POPUP_WIDTH, 
+				POPUP_HEIGHT, 
+				POPUP_CONTENT, 
+				substr(POPUP_ST_DT,1,16) as POPUP_ST_DT, 
+				substr(POPUP_ST_DT,1,10) as POPUP_ST_DT_YMD, 
+				substr(POPUP_ST_DT,12,2) as POPUP_ST_DT_HOUR, 
+				substr(POPUP_ST_DT,15,2) as POPUP_ST_DT_MINUTE, 
+				substr(POPUP_ED_DT,1,16) as POPUP_ED_DT, 
+				substr(POPUP_ED_DT,1,10) as POPUP_ED_DT_YMD, 
+				substr(POPUP_ED_DT,12,2) as POPUP_ED_DT_HOUR, 
+				substr(POPUP_ED_DT,15,2) as POPUP_ED_DT_MINUTE, 
+				POPUP_USE_ST, 
+				POPUP_HIT_CNT, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT,
+				CASE
+					WHEN (NOW() > POPUP_ED_DT) THEN 'E'
+					WHEN (NOW() < POPUP_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as POPUP_STATUS
+			from base_popup_tb
+			where popup_seq = #popup_seq# 
+		]]>
+	</select>
+	
+	<!-- 압업등록 -->
+	<insert id="insert_popup" parameterClass="AdmgrConfigVO" >
+		<![CDATA[
+			insert into base_popup_tb 
+				(POPUP_NM, POPUP_TOP, POPUP_LEFT, POPUP_WIDTH, POPUP_HEIGHT, POPUP_CONTENT, POPUP_ST_DT, POPUP_ED_DT, POPUP_USE_ST, POPUP_HIT_CNT, REG_DT, MOD_DT)
+			values
+				(#popup_nm#, #popup_top#, #popup_left#, #popup_width#, #popup_height#, #popup_content#, #popup_st_dt#, #popup_ed_dt#, #popup_use_st#, 0, now(), now()) 
+		]]>
+	</insert>
+	
+	<!-- 압업수정 -->
+	<update id="update_popup" parameterClass="AdmgrConfigVO" >
+		<![CDATA[
+			update base_popup_tb set
+				POPUP_NM = #popup_nm#,
+				POPUP_TOP = #popup_top#,
+				POPUP_LEFT = #popup_left#,
+				POPUP_WIDTH = #popup_width#,
+				POPUP_HEIGHT = #popup_height#,
+				POPUP_CONTENT = #popup_content#,
+				POPUP_ST_DT = #popup_st_dt#,
+				POPUP_ED_DT = #popup_ed_dt#,
+				POPUP_USE_ST = #popup_use_st#,
+				MOD_DT = now()
+			where popup_seq = #popup_seq# 
+		]]>
+	</update>
+	
+	<!-- 압업삭제 -->
+	<delete id="delete_popup" parameterClass="AdmgrConfigVO" >
+		<![CDATA[
+			delete from base_popup_tb where popup_seq = #popup_seq# 
+		]]>
+	</delete>
+	
+	
+</sqlMap>

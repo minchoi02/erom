@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseExtention">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseIndexVO" type="egovframework.base.index.service.BaseIndexVO"/>
+	<typeAlias  alias="BaseExtentionVO" type="egovframework.base.extention.service.BaseExtentionVO"/>
+
+	<select id="get_gps_store_list" parameterClass="BaseIndexVO" resultClass="BaseIndexVO">
+		<![CDATA[
+		select 
+			STORE_ID,
+			STORE_NM,
+			STORE_LAT,
+			STORE_LNG,
+			STORE_ZIP,
+			STORE_ADDR_1
+			STORE_ADDR_2,
+			STORE_TEL,
+			(6371 * ACOS(
+					COS(RADIANS(#user_lat#)) * COS(RADIANS(STORE_LAT)) 
+					* 
+					COS(RADIANS(STORE_LNG)-RADIANS(#user_lng#)) 
+					+ 
+					SIN(RADIANS(#user_lat#)) 
+					* 
+					SIN(RADIANS(STORE_LAT)) 
+				) 
+			) AS distance
+			
+		from base_store_tb
+		where 1
+		 	and STORE_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="map_type" >
+			<isEqual property="map_type" compareValue="CD002001">
+			<![CDATA[
+				and STORE_USE_TRAVEL = 'Y'
+			]]>
+			</isEqual>
+			<isEqual property="map_type" compareValue="CD002002">
+			<![CDATA[
+				and STORE_USE_HOUSE = 'Y'
+			]]>
+			</isEqual>
+			<isEqual property="map_type" compareValue="CD002003">
+			<![CDATA[
+				and STORE_USE_FOOD = 'Y'
+			]]>
+			</isEqual>
+			<isEqual property="map_type" compareValue="CD002004">
+			<![CDATA[
+				and STORE_USE_MARKET = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>		
+		<![CDATA[
+			HAVING distance <= #map_size#
+		]]>
+	</select>
+	
+</sqlMap>

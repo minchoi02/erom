@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseSearch">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseSearchVO" type="egovframework.base.search.service.BaseSearchVO"/>
+
+	<select id="get_my_keyword" parameterClass="BaseSearchVO" resultClass="BaseSearchVO">
+		<![CDATA[
+			select 
+				KEYWORDS
+			from base_log_keyword_date_tb
+			where 1
+		]]>
+		<isNotEmpty property="user_id" prepend="AND">
+		<![CDATA[
+				USER_ID = #user_id#
+		]]>
+		</isNotEmpty>  
+		<isEmpty property="user_id" prepend="AND">
+		<![CDATA[
+				SESS_ID = #sess_id#
+		]]>
+		</isEmpty>
+		<![CDATA[
+				group by KEYWORDS
+				order by REG_DT desc
+				limit 10
+		]]>
+	</select>
+	
+	<select id="get_best_keyword" parameterClass="BaseSearchVO" resultClass="BaseSearchVO">
+		<![CDATA[
+			select 
+				KEYWORDS,  
+				HIT_CNT  
+			from base_log_keyword_hit_tb
+			where 1
+				order by HIT_CNT desc, LAST_DT desc
+				limit 10
+		]]>  
+	</select>
+	
+
+	<select id="get_search_prod_limit" parameterClass="BaseSearchVO" resultClass="BaseSearchVO">
+		<![CDATA[
+			select 
+				PROD_SEQ,
+				PROD_USE_ST,
+				STORE_ID,
+				STORE_NM,
+				STORE_CATEGORY,
+				PROD_ID,
+				PROD_NM,
+				PROD_CATEGORY,
+				(select BASE_CD_NM from base_code_cd_tb where BASE_CD = PROD_CATEGORY) as PROD_CATEGORY_NM,
+				PROD_COMMENT,
+				PROD_MARKET_PRICE,
+				PROD_PRICE,
+				PROD_PRICE_PERCENT,
+				PROD_MIN_PRICE,
+				PROD_ORDERBY,
+				substr(PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE,
+				PROD_HIT_CNT,
+				PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = PROD_ID) as PROD_REVIEW_CNT,
+				PROD_USE_COUPON_ST,
+				PROD_USE_MILEAGE_ST,
+				PROD_USE_PAY_ST,
+				PROD_RESERVE_LIMIT,
+				PROD_BUNDLE_DELIVERY,
+				PROD_CONTENT_TIME,
+				PROD_CONTENT_PAY,
+				PROD_CONTENT_PRECAUTIONS,
+				PROD_CONTENT_COURSE,
+				PROD_IMG_1,
+				PROD_IMG_2,
+				PROD_IMG_3,
+				PROD_IMG_4,
+				PROD_IMG_5,
+				PROD_IMG_6,
+				PROD_IMG_7,
+				PROD_IMG_8,
+				PROD_IMG_9,
+				PROD_IMG_10,
+				PROD_MAKER,
+				PROD_COUNTRY,
+				(select count(*) from base_favorite_prod_tb fav where USER_ID=#user_id# AND fav.PROD_ID = base_product_tb.PROD_ID) AS is_fav
+			from base_product_tb
+			where 1
+				and DEL_ST = 'N'
+				and PROD_USE_ST != 'N'
+				and PROD_ST_DT <= now()
+				and PROD_ED_DT >= now() 
+				and STORE_CATEGORY = #store_category#
+				and $search_sql$
+				order by PROD_ORDERBY desc, PROD_HIT_CNT desc, PROD_PICK_CNT desc, PROD_STAR desc
+				limit 100
+		]]>  
+	</select>
+	
+	<select id="get_search_prod_list" parameterClass="BaseSearchVO" resultClass="BaseSearchVO">
+		<![CDATA[
+			select 
+				PROD_SEQ,
+				PROD_USE_ST,
+				STORE_ID,
+				STORE_NM,
+				STORE_CATEGORY,
+				PROD_ID,
+				PROD_NM,
+				PROD_CATEGORY,
+				(select BASE_CD_NM from base_code_cd_tb where BASE_CD = PROD_CATEGORY) as PROD_CATEGORY_NM,
+				PROD_COMMENT,
+				PROD_MARKET_PRICE,
+				PROD_PRICE,
+				PROD_PRICE_PERCENT,
+				PROD_MIN_PRICE,
+				PROD_ORDERBY,
+				substr(PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE,
+				PROD_HIT_CNT,
+				PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = PROD_ID) as PROD_REVIEW_CNT,
+				PROD_USE_COUPON_ST,
+				PROD_USE_MILEAGE_ST,
+				PROD_USE_PAY_ST,
+				PROD_RESERVE_LIMIT,
+				PROD_BUNDLE_DELIVERY,
+				PROD_CONTENT_TIME,
+				PROD_CONTENT_PAY,
+				PROD_CONTENT_PRECAUTIONS,
+				PROD_CONTENT_COURSE,
+				PROD_IMG_1,
+				PROD_IMG_2,
+				PROD_IMG_3,
+				PROD_IMG_4,
+				PROD_IMG_5,
+				PROD_IMG_6,
+				PROD_IMG_7,
+				PROD_IMG_8,
+				PROD_IMG_9,
+				PROD_IMG_10,
+				PROD_MAKER,
+				PROD_COUNTRY,
+				(select count(*) from base_favorite_prod_tb fav where USER_ID=#user_id# AND fav.PROD_ID = base_product_tb.PROD_ID) AS is_fav
+			from base_product_tb
+			where 1
+				and DEL_ST = 'N'
+				and PROD_USE_ST != 'N'
+				and PROD_ST_DT <= now()
+				and PROD_ED_DT >= now() 
+				and STORE_CATEGORY = #store_category#
+				and $search_sql$
+				order by PROD_ORDERBY desc, PROD_HIT_CNT desc, PROD_PICK_CNT desc, PROD_STAR desc
+				limit #sql_start#, #sql_limit#
+		]]>  
+	</select>
+	
+	<select id="get_search_prod_list_cnt" parameterClass="BaseSearchVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_product_tb
+			where 1
+				and DEL_ST = 'N'
+				and PROD_USE_ST != 'N'
+				and PROD_ST_DT <= now()
+				and PROD_ED_DT >= now() 
+				and STORE_CATEGORY = #store_category#
+				and $search_sql$
+				order by PROD_ORDERBY desc, PROD_HIT_CNT desc, PROD_PICK_CNT desc, PROD_STAR desc
+		]]>  
+	</select>
+	
+	<insert id="set_keyword" parameterClass="BaseSearchVO">
+		<![CDATA[
+			insert into base_log_keyword_date_tb
+			(
+			USER_ID, SESS_ID, REMOTE_ADDR, KEYWORDS, REG_DT
+			)
+			values
+			(
+			#user_id#, #sess_id#, #remote_addr#, #keywords#, now()
+			)
+		]]>
+	</insert>
+	
+	<select id="search_keyword" parameterClass="BaseSearchVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_log_keyword_hit_tb
+			where 1
+				and KEYWORDS = #keywords#
+		]]>
+	</select>
+	
+	<insert id="insert_keyword" parameterClass="BaseSearchVO">
+		<![CDATA[
+			insert into base_log_keyword_hit_tb
+			(
+			KEYWORDS, HIT_CNT, LAST_DT
+			)
+			values
+			(
+			#keywords#, 1, now()
+			)
+			
+		]]>
+	</insert>
+	
+	<update id="update_keyword" parameterClass="BaseSearchVO">
+		<![CDATA[
+			update base_log_keyword_hit_tb set
+				HIT_CNT = HIT_CNT + 1,
+				LAST_DT = now()
+			where 1
+				and KEYWORDS = #keywords#
+		]]>
+	</update>
+	
+</sqlMap>

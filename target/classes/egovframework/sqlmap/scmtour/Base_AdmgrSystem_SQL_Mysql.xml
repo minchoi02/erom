@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AdmgrSystem">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrSystemVO" type="egovframework.admgrSystem.service.AdmgrSystemVO"/>
+
+	<select id="get_cd_list" parameterClass="AdmgrSystemVO" resultClass="AdmgrSystemVO">
+		<![CDATA[
+			select 
+				BASE_GP_CD,                                     
+				BASE_CD,                                     
+				BASE_CD_NM,                                     
+				BASE_API_CD,      
+				BASE_USE_ST,                       
+				BASE_NM_ST,          
+				BASE_MOD_ST,  
+				BASE_ORDERBY
+			from base_code_cd_tb
+			where 1
+				and BASE_GP_CD = #base_gp_cd#
+			order by BASE_USE_ST, BASE_CD, BASE_ORDERBY asc 
+		]]>
+	</select>
+	
+	<update id="update_cd" parameterClass="AdmgrSystemVO" >
+		<![CDATA[
+			update  base_code_cd_tb set
+				BASE_CD_NM = #base_cd_nm#,                                     
+				BASE_API_CD = #base_api_cd#,                                     
+				BASE_USE_ST = #base_use_st#                       
+			where 1
+				and BASE_CD = #base_cd#
+		]]>
+	</update>
+	
+	<select id="get_sms_templete" parameterClass="AdmgrSystemVO" resultClass="AdmgrSystemVO">
+		<![CDATA[
+			select 
+				SMS_SEQ,                                     
+				SMS_CD,                                     
+				SMS_USE_USER,                                     
+				SMS_USE_STORE,      
+				SMS_USE_CENTER,                       
+				SMS_CONTENT_USER,          
+				SMS_CONTENT_STORE,  
+				SMS_CONTENT_CENTER
+			from base_config_sms_content_tb
+			where 1
+				and SMS_CD = #sms_cd#
+		]]>
+	</select>
+	
+	<update id="set_sms_templete" parameterClass="AdmgrSystemVO" >
+		<![CDATA[
+			update  base_config_sms_content_tb set
+				SMS_USE_USER = #sms_use_user#,                                     
+				SMS_USE_STORE = #sms_use_store#,
+				SMS_USE_CENTER = #sms_use_center#,            
+				SMS_CONTENT_USER = #sms_content_user#,
+				SMS_CONTENT_STORE = #sms_content_store#,
+				SMS_CONTENT_CENTER = #sms_content_center#                   
+			where 1
+				and SMS_CD = #sms_cd#
+		]]>
+	</update>
+	
+	<select id="get_push_templete" parameterClass="AdmgrSystemVO" resultClass="AdmgrSystemVO">
+		<![CDATA[
+			select 
+				PUSH_SEQ,                                     
+				PUSH_CD,                                     
+				PUSH_USE_USER,                                     
+				PUSH_USE_STORE,      
+				PUSH_USE_CENTER,                       
+				PUSH_CONTENT_USER,          
+				PUSH_CONTENT_STORE,  
+				PUSH_CONTENT_CENTER
+			from base_config_push_content_tb
+			where 1
+				and PUSH_CD = #push_cd#
+		]]>
+	</select>
+	
+	<update id="set_push_templete" parameterClass="AdmgrSystemVO" >
+		<![CDATA[
+			update  base_config_push_content_tb set
+				PUSH_USE_USER = #push_use_user#,                                     
+				PUSH_USE_STORE = #push_use_store#,
+				PUSH_USE_CENTER = #push_use_center#,            
+				PUSH_CONTENT_USER = #push_content_user#,
+				PUSH_CONTENT_STORE = #push_content_store#,
+				PUSH_CONTENT_CENTER = #push_content_center#
+			where 1
+				and PUSH_CD = #push_cd#
+		]]>
+	</update>
+	
+</sqlMap>

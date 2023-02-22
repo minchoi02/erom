@@ -1,0 +1,1195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="admgrStore">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrStoreVO" type="egovframework.admgrStore.service.AdmgrStoreVO"/>
+
+	<!-- 몰목록 불러오기 -->
+	<select id="get_store_list" parameterClass="AdmgrStoreVO" resultClass="AdmgrStoreVO">
+		<![CDATA[
+			select 
+				STORE_SEQ,
+				USER_ID,
+				STORE_ID,
+				STORE_NM,
+				STORE_CEO_NM,
+				STORE_TEL,
+				STORE_HP_1,
+				STORE_HP_2,
+				STORE_USE_ST,
+				STORE_USE_TRAVEL,
+				STORE_USE_HOUSE,
+				STORE_USE_FOOD,
+				STORE_USE_MARKET,
+				STORE_IMG_1,
+				substr(REG_DT,1,19) as REG_DT 
+			from base_store_tb
+			where 1 
+		]]>
+		<isNotEmpty property="user_id" prepend="AND">
+			<![CDATA[
+				USER_ID = #user_id#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_use_st" prepend="AND">
+			<![CDATA[
+				STORE_USE_ST = #store_use_st#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category" >
+			<isEqual prepend="AND" property="store_category" compareValue="CD002001">
+			<![CDATA[
+				STORE_USE_TRAVEL = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002002">
+			<![CDATA[
+				STORE_USE_HOUSE = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002003">
+			<![CDATA[
+				STORE_USE_FOOD = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002004">
+			<![CDATA[
+				STORE_USE_MARKET = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword" prepend="AND">
+		<![CDATA[
+			$search_sql$
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			order by REG_DT desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 몰목록 총 카운터 불러오기 -->
+	<select id="get_store_list_cnt" parameterClass="AdmgrStoreVO" resultClass="int">
+		<![CDATA[
+			select 
+			count(*)
+			from base_store_tb
+			where 1 
+		]]>
+		<isNotEmpty property="user_id" prepend="AND">
+			<![CDATA[
+				USER_ID = #user_id#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_use_st" prepend="AND">
+			<![CDATA[
+				STORE_USE_ST = #store_use_st#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category" >
+			<isEqual prepend="AND" property="store_category" compareValue="CD002001">
+			<![CDATA[
+				STORE_USE_TRAVEL = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002002">
+			<![CDATA[
+				STORE_USE_HOUSE = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002003">
+			<![CDATA[
+				STORE_USE_FOOD = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002004">
+			<![CDATA[
+				STORE_USE_MARKET = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword" prepend="AND">
+		<![CDATA[
+			$search_sql$
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 스토어 정보  -->
+	<select id="get_store_info" parameterClass="AdmgrStoreVO" resultClass="AdmgrStoreVO">
+		<![CDATA[
+			select 
+				base_store_tb.STORE_SEQ,
+				base_store_tb.USER_ID,
+				(select base_member_tb.USER_SEQ from base_member_tb where base_member_tb.USER_ID = base_store_tb.USER_ID) as USER_SEQ, 
+				base_store_tb.STORE_ID,
+				base_store_tb.STORE_NM,
+				base_store_tb.STORE_COMPANY_NM,
+				base_store_tb.STORE_CEO_NM,
+				base_store_tb.STORE_NUMBER,
+				base_store_tb.STORE_AUTH_NUMBER,
+				base_store_tb.STORE_TO_NUMBER,
+				base_store_tb.STORE_EMAIL,
+				base_store_tb.STORE_TEL,
+				base_store_tb.STORE_FAX,
+				base_store_tb.STORE_HP_1,
+				base_store_tb.STORE_HP_2,
+				base_store_tb.STORE_ZIP,
+				base_store_tb.STORE_ADDR_1,
+				base_store_tb.STORE_ADDR_2,
+				base_store_tb.STORE_URL,
+				base_store_tb.STORE_URL_NAVER_BLOG,
+				base_store_tb.STORE_URL_NAVER_CAFE,
+				base_store_tb.STORE_URL_FACEBOOK,
+				base_store_tb.STORE_URL_TWITTER,
+				base_store_tb.STORE_URL_INSTAGRAM,
+				base_store_tb.STORE_URL_YOUTUBE,
+				base_store_tb.STORE_LAT,
+				base_store_tb.STORE_LNG,
+				base_store_tb.STORE_INTRODUCTION,
+				base_store_tb.STORE_ADMIN_MEMO,
+				base_store_tb.STORE_USE_ST,
+				base_store_tb.STORE_BANK_NM_CD,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_BANK_NM_CD) as STORE_BANK_NM,
+				base_store_tb.STORE_BANK_NUMBER,
+				base_store_tb.STORE_BANK_USER_NM,
+				base_store_tb.STORE_IMG_1,
+				base_store_tb.STORE_IMG_2,
+				base_store_tb.STORE_IMG_3,
+				base_store_tb.STORE_IMG_4,
+				base_store_tb.STORE_IMG_5,
+				base_store_tb.STORE_IMG_6,
+				base_store_tb.STORE_IMG_7,
+				base_store_tb.STORE_IMG_8,
+				base_store_tb.STORE_IMG_9,
+				base_store_tb.STORE_IMG_10,
+				base_store_tb.STORE_MOVIE,
+				substr(base_store_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_store_tb.MOD_DT,1,19) as MOD_DT, 
+				substr(base_store_tb.WITHDRAW_DT,1,19) as WITHDRAW_DT, 
+				base_store_tb.STORE_USE_TRAVEL,
+				base_store_tb.STORE_USE_HOUSE,
+				base_store_tb.STORE_USE_FOOD,
+				base_store_tb.STORE_USE_MARKET,
+				base_store_tb.STORE_TRAVEL_CALC_PERCENT,
+				base_store_tb.STORE_HOUSE_CALC_PERCENT,
+				base_store_tb.STORE_FOOD_CALC_PERCENT,
+				base_store_tb.STORE_MARKET_CALC_PERCENT,
+				base_store_tb.STORE_HOUSE_READY_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_READY_DATE_ED_DT,
+				base_store_tb.STORE_HOUSE_BUSY_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_BUSY_DATE_ED_DT,
+				base_store_tb.STORE_HOUSE_READY2_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_READY2_DATE_ED_DT,
+				base_store_tb.STORE_FOOD_RESERVE_TIME,
+				base_store_tb.STORE_TRAVEL_MIN_ORDER_PRICE,
+				base_store_tb.STORE_HOUSE_MIN_ORDER_PRICE,
+				base_store_tb.STORE_FOOD_MIN_ORDER_PRICE,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_7,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_5,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_3,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_2,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_1,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_0,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_7,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_5,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_3,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_2,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_1,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_0,
+				base_store_tb.STORE_FOOD_RETURN_DAY_7,
+				base_store_tb.STORE_FOOD_RETURN_DAY_5,
+				base_store_tb.STORE_FOOD_RETURN_DAY_3,
+				base_store_tb.STORE_FOOD_RETURN_DAY_2,
+				base_store_tb.STORE_FOOD_RETURN_DAY_1,
+				base_store_tb.STORE_FOOD_RETURN_DAY_0,
+				base_store_tb.STORE_MARKET_DELIVERY_company_cd_1,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_1,
+				base_store_tb.STORE_market_delivery_company_cd_2,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_2,
+				base_store_tb.STORE_market_delivery_company_cd_3,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_3,
+				base_store_tb.STORE_MARKET_DEFAULT_DELIVERY_PRICE,
+				base_store_tb.STORE_MARKET_FREE_DELIVERY_PRICE,
+				base_store_tb.STORE_MARKET_JEJU_DELIVERY_PRICE,
+				base_store_tb.STORE_TRAVEL_RESERVE_NOTE,
+				base_store_tb.STORE_HOUSE_RESERVE_NOTE,
+				base_store_tb.STORE_FOOD_RESERVE_NOTE,
+				base_store_tb.STORE_MARKET_RETURNCHANGE,
+				base_store_tb.STORE_MARKET_DELIVERY,
+				base_store_tb.STORE_MARKET_ORDER_NOTE,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002001') as TRAVEL_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002002') as HOUSE_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002003') as FOOD_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002004') as MARKET_PROD_CNT,
+				base_store_tb.STORE_INFO_1,
+				base_store_tb.STORE_INFO_2,
+				base_store_tb.STORE_INFO_3,
+				base_store_tb.STORE_INFO_4,
+				base_store_tb.STORE_INFO_5,
+				base_store_tb.STORE_INFO1_1,
+				base_store_tb.STORE_INFO1_2,
+				base_store_tb.STORE_INFO1_3,
+				base_store_tb.STORE_INFO1_4,
+				base_store_tb.STORE_INFO1_5,
+				base_store_tb.STORE_INFO2_1,
+				base_store_tb.STORE_INFO2_2,
+				base_store_tb.STORE_INFO2_3,
+				base_store_tb.STORE_INFO2_4,
+				base_store_tb.STORE_INFO2_5,
+				base_store_tb.STORE_INFO2_6,
+				base_store_tb.STORE_INFO2_7,
+				base_store_tb.STORE_INFO3_1,
+				base_store_tb.STORE_INFO3_2,
+				base_store_tb.STORE_INFO3_3,
+				base_store_tb.STORE_INFO3_4,
+				base_store_tb.STORE_INFO3_5,
+				base_store_tb.STORE_INFO3_6,
+				base_store_tb.STORE_INFO3_7,
+				base_store_tb.STORE_INFO3_8,
+				base_store_tb.STORE_INFO3_9,
+				base_store_tb.STORE_INFO3_10,
+				base_store_tb.STORE_INFO4_1,
+				base_store_tb.STORE_INFO4_2,
+				base_store_tb.STORE_INFO4_3,
+				base_store_tb.STORE_INFO4_4,
+				base_store_tb.STORE_INFO4_5,
+				base_store_tb.STORE_INFO4_6,
+				base_store_tb.STORE_INFO4_7,
+				base_store_tb.STORE_INFO4_8,
+				base_store_tb.STORE_INFO4_9,
+				base_store_tb.STORE_INFO4_10,
+				base_store_tb.STORE_INFO4_11,
+				base_store_tb.STORE_INFO5_1,
+				base_store_tb.STORE_INFO5_2,
+				base_store_tb.STORE_INFO5_3,
+				base_store_tb.STORE_INFO5_4,
+				base_store_tb.STORE_INFO5_5,
+				base_store_tb.STORE_INFO5_6,
+				base_store_tb.STORE_INFO5_7,
+				base_store_tb.STORE_INFO5_8,
+				base_store_tb.STORE_INFO5_9,
+				base_store_tb.STORE_INFO5_10,
+				base_store_tb.STORE_INFO6_1,
+				base_store_tb.STORE_INFO6_2,
+				base_store_tb.STORE_INFO6_3,
+				base_store_tb.STORE_INFO6_4,
+				base_store_tb.STORE_INFO6_5,
+				base_store_tb.STORE_INFO6_6,
+				base_store_tb.STORE_INFO6_7,
+				base_store_tb.STORE_INFO6_8,
+				base_store_tb.STORE_INFO6_9,
+				base_store_tb.STORE_INFO6_10,
+				base_store_tb.STORE_INFO6_11,
+				base_store_tb.STORE_INFO6_12,
+				base_store_tb.STORE_INFO6_13,
+				base_store_tb.STORE_INFO7_1,
+				base_store_tb.STORE_INFO7_2,
+				base_store_tb.STORE_INFO7_3,
+				base_store_tb.STORE_INFO7_4,
+				base_store_tb.STORE_INFO7_5,
+				base_store_tb.STORE_INFO7_6,
+				base_store_tb.STORE_INFO7_7,
+				base_store_tb.STORE_INFO7_8,
+				base_store_tb.STORE_INFO7_9,
+				base_store_tb.STORE_INFO7_10,
+				base_store_tb.STORE_INFO7_11,
+				base_store_tb.STORE_INFO8_1,
+				base_store_tb.STORE_INFO8_2,
+				base_store_tb.STORE_INFO8_3,
+				base_store_tb.STORE_INFO8_4,
+				base_store_tb.STORE_INFO8_5
+			from base_store_tb
+			where 
+				base_store_tb.STORE_SEQ = #store_seq#
+		]]>
+	</select>
+	
+	<!-- 스토어 정보  -->
+	<select id="get_store_simple_id_info" parameterClass="AdmgrStoreVO" resultClass="AdmgrStoreVO">
+		<![CDATA[
+			select 
+				base_store_tb.STORE_SEQ,
+				base_store_tb.USER_ID,
+				(select base_member_tb.USER_SEQ from base_member_tb where base_member_tb.USER_ID = base_store_tb.USER_ID) as USER_SEQ, 
+				base_store_tb.STORE_ID,
+				base_store_tb.STORE_NM,
+				base_store_tb.STORE_COMPANY_NM,
+				base_store_tb.STORE_CEO_NM,
+				base_store_tb.STORE_NUMBER,
+				base_store_tb.STORE_AUTH_NUMBER,
+				base_store_tb.STORE_TO_NUMBER,
+				base_store_tb.STORE_EMAIL,
+				base_store_tb.STORE_TEL,
+				base_store_tb.STORE_FAX,
+				base_store_tb.STORE_HP_1,
+				base_store_tb.STORE_HP_2,
+				base_store_tb.STORE_ZIP,
+				base_store_tb.STORE_ADDR_1,
+				base_store_tb.STORE_ADDR_2,
+				base_store_tb.STORE_URL,
+				base_store_tb.STORE_URL_NAVER_BLOG,
+				base_store_tb.STORE_URL_NAVER_CAFE,
+				base_store_tb.STORE_URL_FACEBOOK,
+				base_store_tb.STORE_URL_TWITTER,
+				base_store_tb.STORE_URL_INSTAGRAM,
+				base_store_tb.STORE_URL_YOUTUBE,
+				base_store_tb.STORE_LAT,
+				base_store_tb.STORE_LNG,
+				base_store_tb.STORE_INTRODUCTION,
+				base_store_tb.STORE_ADMIN_MEMO,
+				base_store_tb.STORE_USE_ST,
+				base_store_tb.STORE_BANK_NM_CD,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_BANK_NM_CD) as STORE_BANK_NM,
+				base_store_tb.STORE_BANK_NUMBER,
+				base_store_tb.STORE_BANK_USER_NM,
+				base_store_tb.STORE_IMG_1,
+				base_store_tb.STORE_IMG_2,
+				base_store_tb.STORE_IMG_3,
+				base_store_tb.STORE_IMG_4,
+				base_store_tb.STORE_IMG_5,
+				base_store_tb.STORE_IMG_6,
+				base_store_tb.STORE_IMG_7,
+				base_store_tb.STORE_IMG_8,
+				base_store_tb.STORE_IMG_9,
+				base_store_tb.STORE_IMG_10,
+				base_store_tb.STORE_MOVIE,
+				substr(base_store_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_store_tb.MOD_DT,1,19) as MOD_DT, 
+				substr(base_store_tb.WITHDRAW_DT,1,19) as WITHDRAW_DT, 
+				base_store_tb.STORE_USE_TRAVEL,
+				base_store_tb.STORE_USE_HOUSE,
+				base_store_tb.STORE_USE_FOOD,
+				base_store_tb.STORE_USE_MARKET,
+				base_store_tb.STORE_TRAVEL_CALC_PERCENT,
+				base_store_tb.STORE_HOUSE_CALC_PERCENT,
+				base_store_tb.STORE_FOOD_CALC_PERCENT,
+				base_store_tb.STORE_MARKET_CALC_PERCENT,
+				base_store_tb.STORE_HOUSE_READY_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_READY_DATE_ED_DT,
+				base_store_tb.STORE_HOUSE_BUSY_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_BUSY_DATE_ED_DT,
+				base_store_tb.STORE_HOUSE_READY2_DATE_ST_DT,
+				base_store_tb.STORE_HOUSE_READY2_DATE_ED_DT,
+				base_store_tb.STORE_FOOD_RESERVE_TIME,
+				base_store_tb.STORE_TRAVEL_MIN_ORDER_PRICE,
+				base_store_tb.STORE_HOUSE_MIN_ORDER_PRICE,
+				base_store_tb.STORE_FOOD_MIN_ORDER_PRICE,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_7,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_5,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_3,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_2,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_1,
+				base_store_tb.STORE_TRAVEL_RETURN_DAY_0,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_7,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_5,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_3,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_2,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_1,
+				base_store_tb.STORE_HOUSE_RETURN_DAY_0,
+				base_store_tb.STORE_FOOD_RETURN_DAY_7,
+				base_store_tb.STORE_FOOD_RETURN_DAY_5,
+				base_store_tb.STORE_FOOD_RETURN_DAY_3,
+				base_store_tb.STORE_FOOD_RETURN_DAY_2,
+				base_store_tb.STORE_FOOD_RETURN_DAY_1,
+				base_store_tb.STORE_FOOD_RETURN_DAY_0,
+				base_store_tb.STORE_MARKET_DELIVERY_company_cd_1,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_1,
+				base_store_tb.STORE_market_delivery_company_cd_2,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_2,
+				base_store_tb.STORE_market_delivery_company_cd_3,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_store_tb.STORE_MARKET_DELIVERY_company_cd_1) as STORE_MARKET_DELIVERY_COMPANY_NM_3,
+				base_store_tb.STORE_MARKET_DEFAULT_DELIVERY_PRICE,
+				base_store_tb.STORE_MARKET_FREE_DELIVERY_PRICE,
+				base_store_tb.STORE_MARKET_JEJU_DELIVERY_PRICE,
+				base_store_tb.STORE_TRAVEL_RESERVE_NOTE,
+				base_store_tb.STORE_HOUSE_RESERVE_NOTE,
+				base_store_tb.STORE_FOOD_RESERVE_NOTE,
+				base_store_tb.STORE_MARKET_RETURNCHANGE,
+				base_store_tb.STORE_MARKET_DELIVERY,
+				base_store_tb.STORE_MARKET_ORDER_NOTE,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002001') as TRAVEL_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002002') as HOUSE_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002003') as FOOD_PROD_CNT,
+				(select count(*) from base_product_tb where base_product_tb.STORE_ID = base_store_tb.STORE_ID and base_product_tb.STORE_CATEGORY = 'CD002004') as MARKET_PROD_CNT,
+				base_store_tb.STORE_INFO_1,
+				base_store_tb.STORE_INFO_2,
+				base_store_tb.STORE_INFO_3,
+				base_store_tb.STORE_INFO_4,
+				base_store_tb.STORE_INFO_5,
+				base_store_tb.STORE_INFO1_1,
+				base_store_tb.STORE_INFO1_2,
+				base_store_tb.STORE_INFO1_3,
+				base_store_tb.STORE_INFO1_4,
+				base_store_tb.STORE_INFO1_5,
+				base_store_tb.STORE_INFO2_1,
+				base_store_tb.STORE_INFO2_2,
+				base_store_tb.STORE_INFO2_3,
+				base_store_tb.STORE_INFO2_4,
+				base_store_tb.STORE_INFO2_5,
+				base_store_tb.STORE_INFO2_6,
+				base_store_tb.STORE_INFO2_7,
+				base_store_tb.STORE_INFO3_1,
+				base_store_tb.STORE_INFO3_2,
+				base_store_tb.STORE_INFO3_3,
+				base_store_tb.STORE_INFO3_4,
+				base_store_tb.STORE_INFO3_5,
+				base_store_tb.STORE_INFO3_6,
+				base_store_tb.STORE_INFO3_7,
+				base_store_tb.STORE_INFO3_8,
+				base_store_tb.STORE_INFO3_9,
+				base_store_tb.STORE_INFO3_10,
+				base_store_tb.STORE_INFO4_1,
+				base_store_tb.STORE_INFO4_2,
+				base_store_tb.STORE_INFO4_3,
+				base_store_tb.STORE_INFO4_4,
+				base_store_tb.STORE_INFO4_5,
+				base_store_tb.STORE_INFO4_6,
+				base_store_tb.STORE_INFO4_7,
+				base_store_tb.STORE_INFO4_8,
+				base_store_tb.STORE_INFO4_9,
+				base_store_tb.STORE_INFO4_10,
+				base_store_tb.STORE_INFO4_11,
+				base_store_tb.STORE_INFO5_1,
+				base_store_tb.STORE_INFO5_2,
+				base_store_tb.STORE_INFO5_3,
+				base_store_tb.STORE_INFO5_4,
+				base_store_tb.STORE_INFO5_5,
+				base_store_tb.STORE_INFO5_6,
+				base_store_tb.STORE_INFO5_7,
+				base_store_tb.STORE_INFO5_8,
+				base_store_tb.STORE_INFO5_9,
+				base_store_tb.STORE_INFO5_10,
+				base_store_tb.STORE_INFO6_1,
+				base_store_tb.STORE_INFO6_2,
+				base_store_tb.STORE_INFO6_3,
+				base_store_tb.STORE_INFO6_4,
+				base_store_tb.STORE_INFO6_5,
+				base_store_tb.STORE_INFO6_6,
+				base_store_tb.STORE_INFO6_7,
+				base_store_tb.STORE_INFO6_8,
+				base_store_tb.STORE_INFO6_9,
+				base_store_tb.STORE_INFO6_10,
+				base_store_tb.STORE_INFO6_11,
+				base_store_tb.STORE_INFO6_12,
+				base_store_tb.STORE_INFO6_13,
+				base_store_tb.STORE_INFO7_1,
+				base_store_tb.STORE_INFO7_2,
+				base_store_tb.STORE_INFO7_3,
+				base_store_tb.STORE_INFO7_4,
+				base_store_tb.STORE_INFO7_5,
+				base_store_tb.STORE_INFO7_6,
+				base_store_tb.STORE_INFO7_7,
+				base_store_tb.STORE_INFO7_8,
+				base_store_tb.STORE_INFO7_9,
+				base_store_tb.STORE_INFO7_10,
+				base_store_tb.STORE_INFO7_11,
+				base_store_tb.STORE_INFO8_1,
+				base_store_tb.STORE_INFO8_2,
+				base_store_tb.STORE_INFO8_3,
+				base_store_tb.STORE_INFO8_4,
+				base_store_tb.STORE_INFO8_5
+			from base_store_tb
+			where 
+			base_store_tb.STORE_ID = #store_id#
+		]]>
+	</select>
+	
+	<!--상점등록 -->
+	<insert id="insert_store"  parameterClass="AdmgrStoreVO" >
+		<![CDATA[
+		insert into base_store_tb (
+			USER_ID, STORE_ID, STORE_NM, STORE_COMPANY_NM, STORE_CEO_NM, STORE_NUMBER, STORE_AUTH_NUMBER, STORE_TO_NUMBER, STORE_EMAIL,
+			STORE_TEL, STORE_FAX, STORE_HP_1, STORE_HP_2, STORE_ZIP, STORE_ADDR_1, STORE_ADDR_2, STORE_URL, 
+			STORE_URL_NAVER_BLOG, STORE_URL_NAVER_CAFE, STORE_URL_FACEBOOK, STORE_URL_TWITTER, STORE_URL_INSTAGRAM, STORE_URL_YOUTUBE, 
+			STORE_LAT, STORE_LNG, STORE_INTRODUCTION, STORE_ADMIN_MEMO, STORE_USE_ST,
+			STORE_BANK_NM_CD, STORE_BANK_NUMBER, STORE_BANK_USER_NM,
+			STORE_IMG_1, STORE_IMG_2, STORE_IMG_3, STORE_IMG_4, STORE_IMG_5, STORE_IMG_6, STORE_IMG_7, STORE_IMG_8, STORE_IMG_9, STORE_IMG_10, STORE_MOVIE,
+			REG_DT, MOD_DT, 
+			STORE_USE_TRAVEL, STORE_USE_HOUSE, STORE_USE_FOOD, STORE_USE_MARKET,
+			STORE_TRAVEL_CALC_PERCENT, STORE_HOUSE_CALC_PERCENT, STORE_FOOD_CALC_PERCENT, STORE_MARKET_CALC_PERCENT,
+		]]>
+		<isNotEmpty property="store_house_ready_date_st_dt" >
+		<![CDATA[
+				STORE_HOUSE_READY_DATE_ST_DT,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready_date_ed_dt" >
+		<![CDATA[
+				STORE_HOUSE_READY_DATE_ED_DT,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready2_date_st_dt" >
+		<![CDATA[
+				STORE_HOUSE_READY2_DATE_ST_DT,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready2_date_ed_dt" >
+		<![CDATA[
+				STORE_HOUSE_READY2_DATE_ED_DT,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_busy_date_st_dt" >
+		<![CDATA[
+				STORE_HOUSE_BUSY_DATE_ST_DT,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_busy_date_ed_dt" >
+		<![CDATA[
+				STORE_HOUSE_BUSY_DATE_ED_DT,
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			STORE_FOOD_RESERVE_TIME, STORE_TRAVEL_MIN_ORDER_PRICE, STORE_HOUSE_MIN_ORDER_PRICE, STORE_FOOD_MIN_ORDER_PRICE,
+			STORE_TRAVEL_RETURN_DAY_7, STORE_TRAVEL_RETURN_DAY_5, STORE_TRAVEL_RETURN_DAY_3, STORE_TRAVEL_RETURN_DAY_2, 	STORE_TRAVEL_RETURN_DAY_1, 	STORE_TRAVEL_RETURN_DAY_0,
+			STORE_HOUSE_RETURN_DAY_7, STORE_HOUSE_RETURN_DAY_5, STORE_HOUSE_RETURN_DAY_3, STORE_HOUSE_RETURN_DAY_2, STORE_HOUSE_RETURN_DAY_1, STORE_HOUSE_RETURN_DAY_0,
+			STORE_FOOD_RETURN_DAY_7, STORE_FOOD_RETURN_DAY_5, STORE_FOOD_RETURN_DAY_3, STORE_FOOD_RETURN_DAY_2, STORE_FOOD_RETURN_DAY_1, 	STORE_FOOD_RETURN_DAY_0,
+			STORE_MARKET_DELIVERY_COMPANY_CD_1, STORE_MARKET_DELIVERY_COMPANY_CD_2, STORE_MARKET_DELIVERY_COMPANY_CD_3,
+			STORE_MARKET_DEFAULT_DELIVERY_PRICE, STORE_MARKET_FREE_DELIVERY_PRICE, STORE_MARKET_JEJU_DELIVERY_PRICE,
+			STORE_TRAVEL_RESERVE_NOTE, STORE_HOUSE_RESERVE_NOTE, STORE_FOOD_RESERVE_NOTE, 
+			STORE_MARKET_RETURNCHANGE, STORE_MARKET_DELIVERY, STORE_MARKET_ORDER_NOTE,
+			STORE_INFO_1, 	STORE_INFO_2, 	STORE_INFO_3, 	STORE_INFO_4, 	STORE_INFO_5,
+			STORE_INFO1_1, STORE_INFO1_2, STORE_INFO1_3, STORE_INFO1_4, STORE_INFO1_5,
+			STORE_INFO2_1, STORE_INFO2_2, STORE_INFO2_3, STORE_INFO2_4, STORE_INFO2_5,
+			STORE_INFO2_6, STORE_INFO2_7, 
+			STORE_INFO3_1, STORE_INFO3_2, STORE_INFO3_3, STORE_INFO3_4, STORE_INFO3_5,
+			STORE_INFO3_6, STORE_INFO3_7, STORE_INFO3_8, STORE_INFO3_9, STORE_INFO3_10,
+			STORE_INFO4_1, STORE_INFO4_2, STORE_INFO4_3, STORE_INFO4_4, STORE_INFO4_5,
+			STORE_INFO4_6, STORE_INFO4_7, STORE_INFO4_8, STORE_INFO4_9, STORE_INFO4_10,
+			STORE_INFO4_11,
+			STORE_INFO5_1, STORE_INFO5_2, STORE_INFO5_3, STORE_INFO5_4, STORE_INFO5_5,
+			STORE_INFO5_6, STORE_INFO5_7, STORE_INFO5_8, STORE_INFO5_9, STORE_INFO5_10,
+			STORE_INFO6_1, STORE_INFO6_2, STORE_INFO6_3, STORE_INFO6_4, STORE_INFO6_5,
+			STORE_INFO6_6, STORE_INFO6_7, STORE_INFO6_8, STORE_INFO6_9, STORE_INFO6_10,
+			STORE_INFO6_11, STORE_INFO6_12, STORE_INFO6_13, 
+			STORE_INFO7_1, STORE_INFO7_2, STORE_INFO7_3, STORE_INFO7_4, STORE_INFO7_5,
+			STORE_INFO7_6, STORE_INFO7_7, STORE_INFO7_8, STORE_INFO7_9, STORE_INFO7_10,
+			STORE_INFO7_11,
+			STORE_INFO8_1, STORE_INFO8_2, STORE_INFO8_3, STORE_INFO8_4, STORE_INFO8_5
+		) values (
+			#user_id#, #store_id#, #store_nm#, #store_company_nm#, #store_ceo_nm#, #store_number#, #store_auth_number#, #store_to_number#, #store_email#,
+			#store_tel#, #store_fax#, #store_hp_1#, #store_hp_2#, #store_zip#, #store_addr_1#, #store_addr_2#, #store_url#,
+			#store_url_naver_blog#, #store_url_naver_cafe#, #store_url_facebook#, #store_url_twitter#, #store_url_instagram#, #store_url_youtube#,
+			#store_lat#, #store_lng#, #store_introduction#, #store_admin_memo#, #store_use_st#,
+			#store_bank_nm_cd#, #store_bank_number#, #store_bank_user_nm#,
+			#store_img_1#, #store_img_2#, #store_img_3#, #store_img_4#, #store_img_5#, #store_img_6#, #store_img_7#, #store_img_8#, #store_img_9#, #store_img_10#, #store_movie#, 
+			now(), now(), 
+			#store_use_travel#, 	#store_use_house#, #store_use_food#, #store_use_market#, 
+			#store_travel_calc_percent#, #store_house_calc_percent#, #store_food_calc_percent#, #store_market_calc_percent#,
+		]]>
+		<isNotEmpty property="store_house_ready_date_st_dt" >
+		<![CDATA[
+				#store_house_ready_date_st_dt#,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready_date_ed_dt" >
+		<![CDATA[
+				#store_house_ready_date_ed_dt#,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready2_date_st_dt" >
+		<![CDATA[
+				#store_house_ready2_date_st_dt#,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_ready2_date_ed_dt" >
+		<![CDATA[
+				#store_house_ready2_date_ed_dt#,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_busy_date_st_dt" >
+		<![CDATA[
+				#store_house_busy_date_st_dt#,
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_house_busy_date_ed_dt" >
+		<![CDATA[
+				#store_house_busy_date_ed_dt#,
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			#store_food_reserve_time#, #store_travel_min_order_price#, #store_house_min_order_price#, #store_food_min_order_price#,
+			#store_travel_return_day_7#, #store_travel_return_day_5#, #store_travel_return_day_3#, #store_travel_return_day_2#, #store_travel_return_day_1#, #store_travel_return_day_0#,
+			#store_house_return_day_7#, #store_house_return_day_5#, #store_house_return_day_3#, #store_house_return_day_2#, #store_house_return_day_1#, #store_house_return_day_0#,
+			#store_food_return_day_7#, #store_food_return_day_5#, #store_food_return_day_3#, #store_food_return_day_2#, #store_food_return_day_1#, #store_food_return_day_0#,
+			#store_market_delivery_company_cd_1#, #store_market_delivery_company_cd_2#, #store_market_delivery_company_cd_3#,
+			#store_market_default_delivery_price#, #store_market_free_delivery_price#, #store_market_jeju_delivery_price#,
+			#store_travel_reserve_note#, #store_house_reserve_note#, #store_food_reserve_note#,
+			#store_market_returnchange#, #store_market_delivery#, #store_market_order_note#,
+			#store_info_1#, #store_info_2#, #store_info_3#, #store_info_4#, #store_info_5#,
+			#store_info1_1#, #store_info1_2#, #store_info1_3#, #store_info1_4#, #store_info1_5#,
+			#store_info2_1#, #store_info2_2#, #store_info2_3#, #store_info2_4#, #store_info2_5#,
+			#store_info2_6#, #store_info2_7#,
+			#store_info3_1#, #store_info3_2#, #store_info3_3#, #store_info3_4#, #store_info3_5#,
+			#store_info3_6#, #store_info3_7#, #store_info3_8#, #store_info3_9#, #store_info3_10#,
+			#store_info4_1#, #store_info4_2#, #store_info4_3#, #store_info4_4#, #store_info4_5#,
+			#store_info4_6#, #store_info4_7#, #store_info4_8#, #store_info4_9#, #store_info4_10#,
+			#store_info4_11#,
+			#store_info5_1#, #store_info5_2#, #store_info5_3#, #store_info5_4#, #store_info5_5#,
+			#store_info5_6#, #store_info5_7#, #store_info5_8#, #store_info5_9#, #store_info5_10#,
+			#store_info6_1#, #store_info6_2#, #store_info6_3#, #store_info6_4#, #store_info6_5#,
+			#store_info6_6#, #store_info6_7#, #store_info6_8#, #store_info6_9#, #store_info6_10#,
+			#store_info6_11#, #store_info6_12#, #store_info6_13#,
+			#store_info7_1#, #store_info7_2#, #store_info7_3#, #store_info7_4#, #store_info7_5#,
+			#store_info7_6#, #store_info7_7#, #store_info7_8#, #store_info7_9#, #store_info7_10#,
+			#store_info7_11#,
+			#store_info8_1#, #store_info8_2#, #store_info8_3#, #store_info8_4#, #store_info8_5#
+		)
+		]]>
+	</insert>
+	
+	<update id="update_store"  parameterClass="AdmgrStoreVO" >
+		<![CDATA[
+			update base_store_tb set
+		]]>
+		<isNotEmpty property="user_level">
+			<isEqual property="user_level" compareValue="10">
+			<![CDATA[
+				USER_ID = #user_id#,
+				STORE_ADMIN_MEMO = #store_admin_memo#,
+				STORE_TRAVEL_CALC_PERCENT = #store_travel_calc_percent#,
+				STORE_HOUSE_CALC_PERCENT = #store_house_calc_percent#,
+				STORE_FOOD_CALC_PERCENT = #store_food_calc_percent#,
+				STORE_MARKET_CALC_PERCENT = #store_market_calc_percent#,
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+				STORE_NM = #store_nm#,
+				STORE_COMPANY_NM = #store_company_nm#,
+				STORE_CEO_NM = #store_ceo_nm#,
+				STORE_NUMBER = #store_number#,
+				STORE_AUTH_NUMBER = #store_auth_number#,
+				STORE_TO_NUMBER = #store_to_number#,
+				STORE_EMAIL = #store_email#,
+				STORE_TEL = #store_tel#,
+				STORE_FAX = #store_fax#,
+				STORE_HP_1 = #store_hp_1#,
+				STORE_HP_2 = #store_hp_2#,
+				STORE_ZIP = #store_zip#,
+				STORE_ADDR_1 = #store_addr_1#,
+				STORE_ADDR_2 = #store_addr_2#,
+				STORE_URL = #store_url#,
+				STORE_URL_NAVER_BLOG = #store_url_naver_blog#,
+				STORE_URL_NAVER_CAFE = #store_url_naver_cafe#,
+				STORE_URL_FACEBOOK = #store_url_facebook#,
+				STORE_URL_TWITTER = #store_url_twitter#,
+				STORE_URL_INSTAGRAM = #store_url_instagram#,
+				STORE_URL_YOUTUBE = #store_url_youtube#,
+				STORE_LAT = #store_lat#,
+				STORE_LNG = #store_lng#,
+				STORE_INTRODUCTION = #store_introduction#,
+				STORE_USE_ST = #store_use_st#,
+				STORE_BANK_NM_CD = #store_bank_nm_cd#,
+				STORE_BANK_NUMBER = #store_bank_number#,
+				STORE_BANK_USER_NM = #store_bank_user_nm#,
+				STORE_IMG_1 = #store_img_1#,
+				STORE_IMG_2 = #store_img_2#,
+				STORE_IMG_3 = #store_img_3#,
+				STORE_IMG_4 = #store_img_4#,
+				STORE_IMG_5 = #store_img_5#,
+				STORE_IMG_6 = #store_img_6#,
+				STORE_IMG_7 = #store_img_7#,
+				STORE_IMG_8 = #store_img_8#,
+				STORE_IMG_9 = #store_img_9#,
+				STORE_IMG_10 = #store_img_10#,
+				STORE_MOVIE = #store_movie#,
+				MOD_DT = now(),
+				STORE_USE_TRAVEL = #store_use_travel#,
+				STORE_USE_HOUSE = #store_use_house#,
+				STORE_USE_FOOD = #store_use_food#,
+				STORE_USE_MARKET = #store_use_market#,
+			]]>
+			<isNotEmpty property="store_house_ready_date_st_dt" >
+			<![CDATA[
+					STORE_HOUSE_READY_DATE_ST_DT = #store_house_ready_date_st_dt#,
+			]]>
+			</isNotEmpty>
+			<isNotEmpty property="store_house_ready_date_ed_dt" >
+			<![CDATA[
+					STORE_HOUSE_READY_DATE_ED_DT = #store_house_ready_date_ed_dt#,
+			]]>
+			</isNotEmpty>
+			<isNotEmpty property="store_house_ready2_date_st_dt" >
+			<![CDATA[
+					STORE_HOUSE_READY2_DATE_ST_DT = #store_house_ready2_date_st_dt#,
+			]]>
+			</isNotEmpty>
+			<isNotEmpty property="store_house_ready2_date_ed_dt" >
+			<![CDATA[
+					STORE_HOUSE_READY2_DATE_ED_DT = #store_house_ready2_date_ed_dt#,
+			]]>
+			</isNotEmpty>
+			<isNotEmpty property="store_house_busy_date_st_dt" >
+			<![CDATA[
+					STORE_HOUSE_BUSY_DATE_ST_DT = #store_house_busy_date_st_dt#,
+			]]>
+			</isNotEmpty>
+			<isNotEmpty property="store_house_busy_date_ed_dt" >
+			<![CDATA[
+					STORE_HOUSE_BUSY_DATE_ED_DT = #store_house_busy_date_ed_dt#,
+			]]>
+			</isNotEmpty>
+			<![CDATA[				
+				STORE_FOOD_RESERVE_TIME = #store_food_reserve_time#,
+				STORE_TRAVEL_MIN_ORDER_PRICE = #store_travel_min_order_price#,
+				STORE_HOUSE_MIN_ORDER_PRICE = #store_house_min_order_price#,
+				STORE_FOOD_MIN_ORDER_PRICE = #store_food_min_order_price#,
+				STORE_TRAVEL_RETURN_DAY_7 = #store_travel_return_day_7#,
+				STORE_TRAVEL_RETURN_DAY_5 = #store_travel_return_day_5#,
+				STORE_TRAVEL_RETURN_DAY_3 = #store_travel_return_day_3#,
+				STORE_TRAVEL_RETURN_DAY_2 = #store_travel_return_day_2#,
+				STORE_TRAVEL_RETURN_DAY_1 = #store_travel_return_day_1#,
+				STORE_TRAVEL_RETURN_DAY_0 = #store_travel_return_day_0#,
+				STORE_HOUSE_RETURN_DAY_7 = #store_house_return_day_7#,
+				STORE_HOUSE_RETURN_DAY_5 = #store_house_return_day_5#,
+				STORE_HOUSE_RETURN_DAY_3 = #store_house_return_day_3#,
+				STORE_HOUSE_RETURN_DAY_2 = #store_house_return_day_2#,
+				STORE_HOUSE_RETURN_DAY_1 = #store_house_return_day_1#,
+				STORE_HOUSE_RETURN_DAY_0 = #store_house_return_day_0#,
+				STORE_FOOD_RETURN_DAY_7 = #store_food_return_day_7#,
+				STORE_FOOD_RETURN_DAY_5 = #store_food_return_day_5#,
+				STORE_FOOD_RETURN_DAY_3 = #store_food_return_day_3#,
+				STORE_FOOD_RETURN_DAY_2 = #store_food_return_day_2#,
+				STORE_FOOD_RETURN_DAY_1 = #store_food_return_day_1#,
+				STORE_FOOD_RETURN_DAY_0 = #store_food_return_day_0#,
+				STORE_MARKET_DELIVERY_company_cd_1 = #store_market_delivery_company_cd_1#,
+				STORE_market_delivery_company_cd_2 = #store_market_delivery_company_cd_2#,
+				STORE_market_delivery_company_cd_3 = #store_market_delivery_company_cd_3#,
+				STORE_MARKET_DEFAULT_DELIVERY_PRICE = #store_market_default_delivery_price#,
+				STORE_MARKET_FREE_DELIVERY_PRICE = #store_market_free_delivery_price#,
+				STORE_MARKET_JEJU_DELIVERY_PRICE = #store_market_jeju_delivery_price#,
+				STORE_TRAVEL_RESERVE_NOTE = #store_travel_reserve_note#,
+				STORE_HOUSE_RESERVE_NOTE = #store_house_reserve_note#,
+				STORE_FOOD_RESERVE_NOTE = #store_food_reserve_note#,
+				STORE_MARKET_RETURNCHANGE = #store_market_returnchange#,
+				STORE_MARKET_DELIVERY = #store_market_delivery#,
+				STORE_MARKET_ORDER_NOTE = #store_market_order_note#,
+				STORE_INFO_1 = #store_info_1#,
+				STORE_INFO_2 = #store_info_2#,
+				STORE_INFO_3 = #store_info_3#,
+				STORE_INFO_4 = #store_info_4#,
+				STORE_INFO_5  = #store_info_5#,
+				STORE_INFO1_1 = #store_info1_1#, 
+				STORE_INFO1_2 = #store_info1_2#, 
+				STORE_INFO1_3 = #store_info1_3#, 
+				STORE_INFO1_4 = #store_info1_4#, 
+				STORE_INFO1_5 = #store_info1_5#, 
+				STORE_INFO2_1 = #store_info2_1#, 
+				STORE_INFO2_2 = #store_info2_2#, 
+				STORE_INFO2_3 = #store_info2_3#, 
+				STORE_INFO2_4 = #store_info2_4#, 
+				STORE_INFO2_5 = #store_info2_5#, 
+				STORE_INFO2_6 = #store_info2_6#, 
+				STORE_INFO2_7 = #store_info2_7#, 
+				STORE_INFO3_1 = #store_info3_1#, 
+				STORE_INFO3_2 = #store_info3_2#, 
+				STORE_INFO3_3 = #store_info3_3#, 
+				STORE_INFO3_4 = #store_info3_4#, 
+				STORE_INFO3_5 = #store_info3_5#, 
+				STORE_INFO3_6 = #store_info3_6#, 
+				STORE_INFO3_7 = #store_info3_7#, 
+				STORE_INFO3_8 = #store_info3_8#, 
+				STORE_INFO3_9 = #store_info3_9#, 
+				STORE_INFO3_10 = #store_info3_10#, 
+				STORE_INFO4_1 = #store_info4_1#, 
+				STORE_INFO4_2 = #store_info4_2#, 
+				STORE_INFO4_3 = #store_info4_3#, 
+				STORE_INFO4_4 = #store_info4_4#, 
+				STORE_INFO4_5 = #store_info4_5#, 
+				STORE_INFO4_6 = #store_info4_6#, 
+				STORE_INFO4_7 = #store_info4_7#, 
+				STORE_INFO4_8 = #store_info4_8#, 
+				STORE_INFO4_9 = #store_info4_9#, 
+				STORE_INFO4_10 = #store_info4_10#, 
+				STORE_INFO4_11 = #store_info4_11#, 
+				STORE_INFO5_1 = #store_info5_1#, 
+				STORE_INFO5_2 = #store_info5_2#, 
+				STORE_INFO5_3 = #store_info5_3#, 
+				STORE_INFO5_4 = #store_info5_4#, 
+				STORE_INFO5_5 = #store_info5_5#, 
+				STORE_INFO5_6 = #store_info5_6#, 
+				STORE_INFO5_7 = #store_info5_7#, 
+				STORE_INFO5_8 = #store_info5_8#, 
+				STORE_INFO5_9 = #store_info5_9#, 
+				STORE_INFO5_10 = #store_info5_10#, 
+				STORE_INFO6_1 = #store_info6_1#, 
+				STORE_INFO6_2 = #store_info6_2#, 
+				STORE_INFO6_3 = #store_info6_3#, 
+				STORE_INFO6_4 = #store_info6_4#, 
+				STORE_INFO6_5 = #store_info6_5#, 
+				STORE_INFO6_6 = #store_info6_6#, 
+				STORE_INFO6_7 = #store_info6_7#, 
+				STORE_INFO6_8 = #store_info6_8#, 
+				STORE_INFO6_9 = #store_info6_9#, 
+				STORE_INFO6_10 = #store_info6_10#, 
+				STORE_INFO6_11 = #store_info6_11#, 
+				STORE_INFO6_12 = #store_info6_12#, 
+				STORE_INFO6_13 = #store_info6_13#, 
+				STORE_INFO7_1 = #store_info7_1#, 
+				STORE_INFO7_2 = #store_info7_2#, 
+				STORE_INFO7_3 = #store_info7_3#, 
+				STORE_INFO7_4 = #store_info7_4#, 
+				STORE_INFO7_5 = #store_info7_5#, 
+				STORE_INFO7_6 = #store_info7_6#, 
+				STORE_INFO7_7 = #store_info7_7#, 
+				STORE_INFO7_8 = #store_info7_8#, 
+				STORE_INFO7_9 = #store_info7_9#, 
+				STORE_INFO7_10 = #store_info7_10#, 
+				STORE_INFO7_11 = #store_info7_11#, 
+				STORE_INFO8_1 = #store_info8_1#, 
+				STORE_INFO8_2 = #store_info8_2#, 
+				STORE_INFO8_3 = #store_info8_3#, 
+				STORE_INFO8_4 = #store_info8_4#, 
+				STORE_INFO8_5 = #store_info8_5#
+			where STORE_SEQ = #store_seq#
+		]]>
+	</update>
+	
+	
+	<!-- 모달 몰목록 불러오기 -->
+	<select id="get_modal_store_list" parameterClass="AdmgrStoreVO" resultClass="AdmgrStoreVO">
+		<![CDATA[
+			select 
+			STORE_SEQ,
+			USER_ID,
+			STORE_ID,
+			STORE_NM,
+			STORE_CEO_NM,
+			STORE_TEL,
+			STORE_HP_1,
+			STORE_HP_2,
+			STORE_ADDR_1,
+			STORE_ADDR_2,
+			STORE_USE_ST,
+			STORE_USE_TRAVEL,
+			STORE_USE_HOUSE,
+			STORE_USE_FOOD,
+			STORE_USE_MARKET,
+			STORE_IMG_1,
+			substr(REG_DT,1,19) as REG_DT 
+			from base_store_tb
+			where 1 
+		]]>
+		<isNotEmpty property="store_use_st" prepend="AND">
+			<![CDATA[
+				(STORE_USE_ST = 'Y' or STORE_USE_ST = 'R')
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category" >
+			<isEqual prepend="AND" property="store_category" compareValue="CD002001">
+			<![CDATA[
+				STORE_USE_TRAVEL = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002002">
+			<![CDATA[
+				STORE_USE_HOUSE = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002003">
+			<![CDATA[
+				STORE_USE_FOOD = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002004">
+			<![CDATA[
+				STORE_USE_MARKET = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_ceo_nm">
+			<![CDATA[
+				STORE_CEO_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_tel">
+			<![CDATA[
+				STORE_TEL like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_hp">
+			<![CDATA[
+				(STORE_HP_1 like CONCAT('%',#searchKeyword#,'%') or STORE_HP_2 like CONCAT('%',#searchKeyword#,'%'))
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+			order by REG_DT desc
+		]]>
+	</select>
+	
+	<!-- 모달 총 카운터 불러오기 -->
+	<select id="get_modal_store_list_cnt" parameterClass="AdmgrStoreVO" resultClass="int">
+		<![CDATA[
+			select 
+			count(*)
+			from base_store_tb
+			where 1 
+		]]>
+		<isNotEmpty property="store_use_st" prepend="AND">
+			<![CDATA[
+				(STORE_USE_ST = 'Y' or STORE_USE_ST = 'R')
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category" >
+			<isEqual prepend="AND" property="store_category" compareValue="CD002001">
+			<![CDATA[
+				STORE_USE_TRAVEL = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002002">
+			<![CDATA[
+				STORE_USE_HOUSE = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002003">
+			<![CDATA[
+				STORE_USE_FOOD = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="store_category" compareValue="CD002004">
+			<![CDATA[
+				STORE_USE_MARKET = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_ceo_nm">
+			<![CDATA[
+				STORE_CEO_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_tel">
+			<![CDATA[
+				STORE_TEL like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_hp">
+			<![CDATA[
+				(STORE_HP_1 like CONCAT('%',#searchKeyword#,'%') or STORE_HP_2 like CONCAT('%',#searchKeyword#,'%'))
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+	
+	<insert id="insert_deny_date" parameterClass="AdmgrStoreVO">
+	<![CDATA[
+		insert into base_store_deny_date_tb 
+			(
+			STORE_ID, STORE_CATEGORY , STORE_DENY_DATE
+			)
+			values
+			(
+			#store_id#, #store_category# , #store_deny_date#
+			)
+	]]>
+	</insert>
+
+	<delete id="delete_deny_date" parameterClass="AdmgrStoreVO">
+	<![CDATA[
+		delete from base_store_deny_date_tb where STORE_ID = #store_id#
+	]]>
+	</delete>
+	
+	<select id="get_deny_date_list" parameterClass="AdmgrStoreVO" resultClass="AdmgrStoreVO">
+	<![CDATA[
+		select 
+			STORE_ID,
+			STORE_CATEGORY,
+			STORE_DENY_DATE
+		from base_store_deny_date_tb 
+		where 1
+			and STORE_ID = #store_id#
+			and STORE_CATEGORY = #store_category#
+		order by store_deny_date asc
+	]]>
+	</select>
+	
+	<select id="get_deny_date_list_cnt" parameterClass="AdmgrStoreVO" resultClass="int">
+	<![CDATA[
+		select 
+			count(*)
+		from base_store_deny_date_tb 
+		where 1
+			and STORE_ID = #store_id#
+			and STORE_CATEGORY = #store_category#
+	]]>
+	</select>
+	
+	
+	<select id="get_calc_list" parameterClass="admgrStoreVO" resultClass="admgrStoreVO">
+	<![CDATA[
+		select 
+			CAL_STORE_ID,
+			(select STORE_NM from base_store_tb where STORE_ID = CAL_STORE_ID) as STORE_NM,
+			(select STORE_CEO_NM from base_store_tb where STORE_ID = CAL_STORE_ID) as STORE_CEO_NM,
+			(select STORE_TEL from base_store_tb where STORE_ID = CAL_STORE_ID) as STORE_TEL,
+			CAL_STORE_USER_ID,
+			CAL_CARD_ADJUSTMENT,
+			CAL_CATEGORY_ADJUSTMENT,
+			SUM(CAL_ORDER_PRICE) AS CAL_TOTAL_ORDER_PRICE,
+			SUM(CAL_DELIVERY_PRICE) AS CAL_TOTAL_DELIVERY_PRICE,
+			SUM(CAL_COUPON_PRICE) AS CAL_TOTAL_COUPON_PRICE,
+			SUM(CAL_USE_MILEAGE) AS CAL_TOTAL_MIlEAGE,
+			CAL_ST,
+			count(*) as CALC_TOTAL_CNT,
+			(select count(*) from base_calc_tb b where 1
+				and b.CAL_STORE_ID = base_calc_tb.CAL_STORE_ID
+				and b.CAL_REG_DT like CONCAT(#cal_reg_dt#,'%')
+				and b.CAL_ST = 'N') as CALC_NO_CNT 
+			from base_calc_tb 
+			where 1
+		]]>
+		<isNotEmpty property="cal_store_user_id">
+			<![CDATA[
+				and CAL_STORE_USER_ID = #cal_store_user_id#
+			]]>
+		</isNotEmpty>
+		<![CDATA[
+			and CAL_REG_DT like CONCAT(#cal_reg_dt#,'%') 
+		group by CAL_STORE_ID 
+		order by STORE_NM ASC
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+	]]>
+	</select>
+	<select id="get_calc_list_cnt" parameterClass="admgrStoreVO" resultClass="int">
+	<![CDATA[
+		select 
+			COUNT(DISTINCT(CAL_STORE_ID))
+		from base_calc_tb 
+		where 1
+	]]>
+	<isNotEmpty property="cal_store_user_id">
+		<![CDATA[
+			and CAL_STORE_USER_ID = #cal_store_user_id#
+		]]>
+	</isNotEmpty>
+	<![CDATA[
+			and CAL_REG_DT like CONCAT(#cal_reg_dt#,'%') 
+	]]>
+	</select>
+	
+	<select id="get_calc_master_list" parameterClass="admgrStoreVO" resultClass="admgrStoreVO">
+	<![CDATA[
+		select 
+			CAL_ID,
+			COUNT(*) AS ORDER_DETAIL_CNT,
+			SUM(CAL_ORDER_PRICE) AS DETAIL_TOTAL_PRICE,
+			SUM(CAL_CALC_PRICE) AS CALC_TOTAL_PRICE,
+			CAL_ORDER_ID,
+			CAL_DELIVERY_PRICE,
+			CAL_COUPON_ID,
+			CAL_COUPON_PRICE,
+			CAL_USE_MILEAGE,
+			CAL_ORDER_PAY_ST,
+			CAL_CARD_ADJUSTMENT,
+			SUBSTR(CAL_ORDER_DT,1,19) as CAL_ORDER_DT,
+			CAL_REG_DT,
+			CAL_RES_DT,
+			CAL_ST,
+			(SELECT ORDER_USER_ID FROM base_order_tb WHERE ORDER_ID = CAL_ORDER_ID) AS ORDER_USER_ID,
+			(SELECT ORDER_USER_NM FROM base_order_tb WHERE ORDER_ID = CAL_ORDER_ID) AS ORDER_USER_NM
+		from base_calc_tb
+		where 1
+			and CAL_STORE_ID = #cal_store_id#
+			and CAL_REG_DT like CONCAT(#cal_reg_dt#,'%') 
+		group by CAL_ID, CAL_ORDER_ID, CAL_ST
+		order by CAL_ORDER_ID DESC
+	]]>
+	</select>
+	<select id="get_calc_detail_list" parameterClass="admgrStoreVO" resultClass="admgrStoreVO">
+	<![CDATA[
+		select 
+			cal.CAL_SEQ,
+			cal.CAL_ID,
+			cal.CAL_ORDER_ID,
+			cal.CAL_ORDER_DETAIL_SEQ,
+			cal.CAL_STORE_ID,
+			cal.CAL_STORE_USER_ID,
+			cal.CAL_STORE_CATEGORY,
+			cal.CAL_PROD_CATEGORY,
+			cal.CAL_PROD_ID,
+			(SELECT PROD_IMG_1 FROM base_product_tb WHERE PROD_ID = cal.CAL_PROD_ID) AS PROD_IMG_1,
+			cal.CAL_ROOM_SEQ,
+			cal.CAL_ROOM_NM,
+			cal.CAL_CARD_ADJUSTMENT,
+			cal.CAL_CATEGORY_ADJUSTMENT,
+			cal.CAL_ORDER_PAY_ST,
+			cal.CAL_ORDER_PRICE,
+			cal.CAL_DELIVERY_PRICE,
+			cal.CAL_COUPON_ID,
+			cal.CAL_COUPON_PRICE,
+			cal.CAL_USE_MILEAGE,
+			cal.CAL_ST,
+			substr(cal.CAL_ORDER_DT,1,19) as CAL_ORDER_DT,
+			cal.CAL_REG_DT,
+			cal.CAL_RES_DT,
+			cal.CAL_CONTENT,
+			(SELECT ORDER_USER_ID FROM base_order_tb WHERE ORDER_ID = cal.CAL_ORDER_ID) AS ORDER_USER_ID,
+			(SELECT ORDER_USER_NM FROM base_order_tb WHERE ORDER_ID = cal.CAL_ORDER_ID) AS ORDER_USER_NM,
+			od.OD_PROD_OPT_SEQ,
+			od.OD_PROD_OPT_NM,
+			od.OD_PROD_OPT_PRICE,
+			od.OD_PROD_OPT_CNT,
+			od.OD_ST_DT,
+			od.OD_ED_DT			
+		from base_calc_tb cal, base_order_prod_detail_tb od
+		where 1
+			and cal.CAL_ORDER_DETAIL_SEQ = od.OD_SEQ
+			and cal.CAL_ID = #cal_id#
+			and cal.CAL_ORDER_ID = #cal_order_id#
+			and cal.CAL_STORE_ID = #cal_store_id#
+			and cal.CAL_REG_DT like CONCAT(#cal_reg_dt#,'%') 
+		order by cal.CAL_SEQ DESC
+	]]>
+	</select>
+
+	<update id="update_calc_content" parameterClass="admgrStoreVO">
+	<![CDATA[
+		update base_calc_tb set
+			CAL_CONTENT = #cal_content#		
+		where 1
+			and CAL_SEQ = #cal_seq#
+	]]>
+	</update>
+
+	<update id="update_calc_status" parameterClass="admgrStoreVO">
+	<![CDATA[
+		update base_calc_tb set
+			CAL_ST = #cal_st#,
+	]]>
+	<isEqual property="cal_st" compareValue="N">
+		<![CDATA[
+			CAL_RES_DT = NULL
+		]]>
+	</isEqual>	
+	<isEqual property="cal_st" compareValue="Y">
+		<![CDATA[
+			CAL_RES_DT = now()
+		]]>
+	</isEqual>	
+	<![CDATA[
+		where 1
+			and CAL_ID = #cal_id# 
+			and CAL_ORDER_ID = #cal_order_id#
+			and CAL_STORE_ID = #cal_store_id#
+	]]>
+	</update>
+	
+</sqlMap>

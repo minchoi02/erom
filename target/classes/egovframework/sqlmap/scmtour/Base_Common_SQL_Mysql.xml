@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseCommonConfig">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseVO" type="egovframework.base.service.BaseVO"/>
+	<typeAlias  alias="BaseIndexVO" type="egovframework.base.index.service.BaseIndexVO"/>
+
+	<!--  저장소의 데이터를 리얼로 바꿈 -->
+	<update id="basedbrealupdate" parameterClass="BaseVO" >
+		<![CDATA[
+			update lettnfiledetail set FILE_STRE_COURS = REPLACE(FILE_STRE_COURS, 'c:/webapps', '')
+		]]> 
+	</update>
+	<!--  저장소의 데이터를 개발로 바꿈 -->
+	<update id="basedbdevupdate" parameterClass="BaseVO" >
+		<![CDATA[
+			update lettnfiledetail set FILE_STRE_COURS = REPLACE(FILE_STRE_COURS, '/datav2', 'c:/webapps/datav2')
+		]]> 
+	</update>
+
+	<select id="get_base_cd_list" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select * from base_code_cd_tb 
+			where BASE_GP_CD = #base_gp_cd# and BASE_USE_ST = 'Y' 
+			order by BASE_ORDERBY asc
+		]]> 
+	</select>
+
+	<select id="get_base_cd_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select * from base_code_cd_tb 
+			where BASE_CD = #base_cd#
+		]]> 
+	</select>
+
+	<select id="getFileInfo" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select * from lettnfiledetail where ATCH_FILE_ID = #fild_id#
+		]]> 
+	</select>
+
+	<select id="pick_check" parameterClass="BaseIndexVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_favorite_prod_tb
+			where 1
+				and USER_ID = #user_id#
+				and PROD_ID = #prod_id#
+		]]> 
+	</select>
+
+	<insert id="insert_pick" parameterClass="BaseIndexVO" >
+		<![CDATA[
+			insert into base_favorite_prod_tb 
+				(USER_ID, PROD_ID, REG_DT)
+			values
+				(#user_id#, #prod_id#, now())
+		]]> 
+	</insert>
+
+	<delete id="delete_pick" parameterClass="BaseIndexVO" >
+		<![CDATA[
+			delete from base_favorite_prod_tb
+			where 1 
+				and USER_ID = #user_id#
+				and PROD_ID = #prod_id#
+		]]> 
+	</delete>
+
+	<select id="app_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				ANDROID,
+				IOS,
+				FCM_KEY
+			from base_app_tb
+		]]> 
+	</select>
+	
+	<select id="app_version_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				ANDROID,
+				IOS
+			from base_app_tb
+		]]> 
+	</select>
+	
+	<update id="update_member_token" parameterClass="BaseVO" >
+		<![CDATA[
+		update base_member_tb set
+			USER_DEVICE_OS = #user_device_os#,
+			USER_DEVICE_TOKEN = #user_device_token#
+		where
+			USER_ID = #user_id#
+		]]> 
+	</update>
+	
+	<select id="get_log_prod_view" parameterClass="BaseVO" resultClass="int">
+		<![CDATA[
+			select
+				count(*) 
+			from base_log_product_tb 
+			where 1
+				and REG_DT < #time_now#
+				and REMOTE_IP = #user_ip#
+				and PROD_ID = #prod_id#
+		]]>
+	</select>
+	<insert id="set_prod_view_log" parameterClass="BaseVO">
+		<![CDATA[
+			insert into base_log_product_tb
+			(PROD_ID, USER_ID, REMOTE_IP, REG_DT)
+			values
+			(#prod_id#, #user_id#, #user_ip#, now())
+		]]>
+	</insert>
+	<update id="set_prod_view_cnt" parameterClass="BaseVO">
+		<![CDATA[
+			update base_product_tb set 
+				PROD_HIT_CNT = PROD_HIT_CNT+1
+			where 1
+				and PROD_ID = #prod_id#
+		]]>
+	</update>
+	
+	<select id="get_log_bbs_view" parameterClass="BaseVO" resultClass="int">
+		<![CDATA[
+			select
+				count(*) 
+			from base_log_bbs_tb 
+			where 1
+				and REG_DT < #time_now#
+				and REMOTE_IP = #user_ip#
+				and BBS_SEQ = #bbs_seq#
+		]]>
+	</select>
+	<insert id="set_bbs_view_log" parameterClass="BaseVO">
+		<![CDATA[
+		insert into base_log_bbs_tb
+		(BBS_SEQ, USER_ID, REMOTE_IP, REG_DT)
+		values
+		(#bbs_seq#, #user_id#, #user_ip#, now())
+		]]>
+	</insert>
+	<update id="set_bbs_view_cnt" parameterClass="BaseVO">
+		<![CDATA[
+			update base_bbs_tb set 
+				BBS_HIT_CNT = BBS_HIT_CNT+1
+			where 1
+				and BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+	<select id="get_log_agent" parameterClass="BaseVO" resultClass="int">
+		<![CDATA[
+			select
+				count(*) 
+			from base_log_user_agnet_tb 
+			where 1
+				and SESS_ID = #sess_id#
+				and REMOTE_IP = #user_ip#
+		]]>
+	</select>
+	<insert id="set_log_agent" parameterClass="BaseVO">
+		<![CDATA[
+		insert into base_log_user_agnet_tb
+		(SESS_ID, USER_AGENT, REMOTE_IP, REG_DT)
+		values
+		(#sess_id#, #user_agent#, #user_ip#, now())
+		]]>
+	</insert>
+	
+	
+	<!--  /**** 크폰작업 api ****/   -->
+	<!-- 자동구매확정  : 서천장터만 해당 -->
+	<update id="update_auto_order_end" parameterClass="BaseVO">
+		<![CDATA[
+		update base_order_prod_detail_tb set
+			OD_ORDER_STAT = 'COMPLETE',
+			OD_END_DATE = now(),
+			OD_CALC_ST = 'Y'
+		where 1
+			and OD_STORE_CATEGORY = #store_category#
+		]]>
+		<isEmpty property="od_order_stat">
+		<![CDATA[
+			and OD_ORDER_STAT = #od_order_stat# 
+		]]>
+		</isEmpty>
+		<isEqual property="store_category" compareValue="CD002004">
+		<![CDATA[
+			and OD_DELIVERY_DT > #chkdt#
+		]]>
+		</isEqual>
+		<isEqual property="store_category" compareValue="CD002001">
+		<![CDATA[
+			and OD_ST_DT = #chkdt#
+		]]>
+		</isEqual>
+		<isEqual property="store_category" compareValue="CD002002">
+		<![CDATA[
+			and OD_ST_DT = #chkdt#
+		]]>
+		</isEqual>
+		<isEqual property="store_category" compareValue="CD002003">
+		<![CDATA[
+			and OD_ST_DT = #chkdt#
+		]]>
+		</isEqual>
+		<![CDATA[
+			and OD_CALC_ST != 'Y'
+		]]>
+	</update>
+	
+	
+	<!--  /**** 정산관련 api ****/   -->
+	<select id="get_calc_target_list" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select
+				OD_SEQ,
+				OD_ORDER_ID,
+				OD_STORE_ID,
+				(SELECT USER_ID FROM base_store_tb WHERE base_order_prod_detail_tb.OD_STORE_ID = base_store_tb.STORE_ID) AS USER_ID,
+				OD_STORE_CATEGORY,
+				OD_PROD_CATEGORY,
+				OD_PROD_ID,
+				OD_PROD_NM,
+				OD_ROOM_SEQ,
+				(select PROD_ROOM_NM from base_product_room_tb where base_product_room_tb.PROD_ROOM_SEQ = base_order_prod_detail_tb.OD_ROOM_SEQ) as OD_ROOM_NM,
+				OD_PROD_TOTAL_PRICE,
+				(select ORDER_USE_COUPON_ID from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID) as ORDER_USE_COUPON_ID,
+				(select ORDER_COUPON_PRICE from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID) as ORDER_COUPON_PRICE,
+				(select ORDER_USE_MILEAGE from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID) as ORDER_USE_MILEAGE,
+				IFNULL((select ORDER_TOTAL_DELIVERY_PRICE from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID),0) as ORDER_TOTAL_DELIVERY_PRICE,
+				(select ORDER_PAY_ST from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID) as ORDER_PAY_ST,
+				(select REG_DT from base_order_tb where base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID) as REG_DT,
+				(select STORE_TRAVEL_CALC_PERCENT from base_store_tb where base_store_tb.STORE_ID = base_order_prod_detail_tb.OD_STORE_ID) as STORE_TRAVEL_CALC_PERCENT,
+				(select STORE_HOUSE_CALC_PERCENT from base_store_tb where base_store_tb.STORE_ID = base_order_prod_detail_tb.OD_STORE_ID) as STORE_HOUSE_CALC_PERCENT,
+				(select STORE_FOOD_CALC_PERCENT from base_store_tb where base_store_tb.STORE_ID = base_order_prod_detail_tb.OD_STORE_ID) as STORE_FOOD_CALC_PERCENT,
+				(select STORE_MARKET_CALC_PERCENT from base_store_tb where base_store_tb.STORE_ID = base_order_prod_detail_tb.OD_STORE_ID) as STORE_MARKET_CALC_PERCENT
+			from base_order_prod_detail_tb 
+			where 1
+				and OD_STAT = 'Y'
+				and OD_CALC_ST = 'N'
+		]]>
+	</select>
+	<insert id="insert_calc" parameterClass="BaseVO">
+		<![CDATA[
+		insert into base_calc_tb
+			(
+			CAL_ID, 
+			CAL_ORDER_ID, 
+			CAL_ORDER_DETAIL_SEQ,
+			CAL_STORE_ID,
+			CAL_STORE_USER_ID,
+			CAL_STORE_CATEGORY,
+			CAL_PROD_CATEGORY,
+			CAL_PROD_ID,
+			CAL_ROOM_SEQ,
+			CAL_ROOM_NM,
+			CAL_ORDER_PAY_ST,
+			CAL_CARD_ADJUSTMENT,
+			CAL_CATEGORY_ADJUSTMENT,
+			CAL_ORDER_PRICE,
+			CAL_CALC_PRICE,
+			CAL_DELIVERY_PRICE,
+			CAL_COUPON_ID,
+			CAL_COUPON_PRICE,
+			CAL_USE_MILEAGE,
+			CAL_ST,
+			CAL_ORDER_DT,
+			CAL_REG_DT
+			)
+		values
+			(
+			#cal_id#, 
+			#cal_order_id#, 
+			#cal_order_detail_seq#,
+			#cal_store_id#,
+			#cal_store_user_id#,
+			#cal_store_category#,
+			#cal_prod_category#,
+			#cal_prod_id#,
+			#cal_room_seq#,
+			#cal_room_nm#,
+			#cal_order_pay_st#,
+			#cal_card_adjustment#,
+			#cal_category_adjustment#,
+			#cal_order_price#,
+			#cal_calc_price#,
+			#cal_delivery_price#,
+			#cal_coupon_id#,
+			#cal_coupon_price#,
+			#cal_use_mileage#,
+			#cal_st#,
+			#cal_order_dt#,
+			now()
+			)
+		]]>
+	</insert>
+	<update id="update_order_calc_st" parameterClass="BaseVO">
+		<![CDATA[
+		update base_order_prod_detail_tb set
+			OD_CALC_ST = 'Y'
+		where OD_SEQ = #cal_order_detail_seq#
+		]]>
+	</update>
+	
+	<update id="update_auto_cancel_master" parameterClass="BaseVO">
+		<![CDATA[
+		update base_order_tb set
+			ORDER_ST = 'CANCEL',
+			ORDER_CANCEL_DATE = now()
+		where 1
+			and ORDER_ID = #order_id#
+		]]>
+	</update>
+	<update id="update_auto_cancel_detail" parameterClass="BaseVO">
+		<![CDATA[
+		update base_order_prod_detail_tb set
+			OD_ORDER_STAT = 'CANCEL'
+		where 1
+			and OD_ORDER_ID = #order_id#
+		]]>
+	</update>
+	
+	<!--  정산테이블에 이미 있는지 확인 -->
+	<select id="is_calc" parameterClass="BaseVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_calc_tb 
+			where 1
+				and CAL_ORDER_DETAIL_SEQ = #cal_order_detail_seq#
+		]]>
+	</select>
+	
+	<select id="get_base_sms_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+		select 
+			SMS_SEND,
+			SMS_NO1,
+			SMS_NO2
+		from base_config_default_tb
+		]]>
+	</select>
+	
+	<select id="get_sms_data" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				SMS_SEQ,                                     
+				SMS_CD,                                     
+				SMS_USE_USER,                                     
+				SMS_USE_STORE,      
+				SMS_USE_CENTER,                       
+				SMS_CONTENT_USER,          
+				SMS_CONTENT_STORE,  
+				SMS_CONTENT_CENTER
+			from base_config_sms_content_tb
+			where 1
+				and SMS_CD = #sms_cd#
+		]]>
+	</select>
+	<select id="get_push_data" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				PUSH_SEQ,                                     
+				PUSH_CD,                                     
+				PUSH_USE_USER,                                     
+				PUSH_USE_STORE,      
+				PUSH_USE_CENTER,                       
+				PUSH_CONTENT_USER,          
+				PUSH_CONTENT_STORE,  
+				PUSH_CONTENT_CENTER
+			from base_config_push_content_tb
+			where 1
+				and PUSH_CD = #push_cd#
+		]]>
+	</select>
+	<select id="get_sms_group_list" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				USER_NM,
+				USER_HP,
+				USER_DEVICE_OS,
+				USER_DEVICE_TOKEN
+			from base_member_tb
+			where 1
+				and USER_LEVEL = #user_level#
+				and substr(USER_HP,1,3) = '010'
+		]]>
+	</select>
+	<select id="get_sms_order_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				ORDER_ID,
+				ORDER_USER_ID,
+				ORDER_HP,
+				ORDER_PAY_TIME
+			from base_order_tb
+			where 1
+				and ORDER_ID = #order_id#
+		]]>
+	</select>
+	<select id="get_sms_order_detail_list" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				om.ORDER_USER_ID,
+				om.ORDER_HP,
+				od.OD_ORDER_ID,
+				od.OD_STORE_ID,
+				od.OD_PROD_ID,
+				od.OD_PROD_NM,
+				od.OD_STORE_CATEGORY,
+				od.OD_PROD_CATEGORY,
+				od.OD_ST_DT,
+				od.OD_ED_DT,
+				od.OD_DELIVERY_COMPANY_ID,
+				(SELECT base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD = od.OD_DELIVERY_COMPANY_ID) AS OD_DELIVERY_COMPANY_NM,
+				od.OD_DELIVERY_NUMBER
+			FROM base_order_prod_detail_tb od, base_order_tb om
+			WHERE 1
+				AND om.ORDER_ID = od.OD_ORDER_ID
+				AND od.OD_ORDER_ID = #order_id#
+		]]>
+	</select>
+	<select id="get_sms_member_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				USER_NM,
+				USER_HP,
+				USER_DEVICE_OS,
+				USER_DEVICE_TOKEN
+			from base_member_tb
+			where 1
+				and USER_ID = #user_id#
+				and substr(USER_HP,1,3) = '010'
+		]]>
+	</select>
+	<select id="get_sms_store_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				STORE_NM,
+				STORE_HP_1,                                     
+				STORE_HP_2                                     
+			from base_store_tb
+			where 1
+				and STORE_ID = #store_id#
+		]]>
+	</select>
+	<select id="get_sms_bbs_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				STORE_NM,
+				STORE_HP_1,                                     
+				STORE_HP_2                                     
+			from base_bbs_tb
+			where 1
+				and BBS_ID = #bbs_id#
+				and BBS_SEQ = #bbs_seq#
+		]]>
+	</select>
+	<select id="get_sms_prod_info" parameterClass="BaseVO" resultClass="BaseVO">
+		<![CDATA[
+			select 
+				PROD_ID,
+				PROD_NM,
+				STORE_CATEGORY,                                     
+				PROD_CATEGORY,                                     
+				STORE_ID                                     
+			from base_product_tb
+			where 1
+				and PROD_ID = #prod_id#
+		]]>
+	</select>
+	
+	<insert id="insert_sms" parameterClass="BaseVO">
+		<![CDATA[
+		insert into sc_tran
+			(TR_SENDDATE, TR_PHONE, TR_CALLBACK, TR_MSG)
+		values
+			(
+		]]>
+		<isNotEmpty property="tr_senddate">
+		<![CDATA[
+			#tr_senddate#, 
+		]]>
+		</isNotEmpty>		
+		<isEmpty property="tr_senddate">
+		<![CDATA[
+			now(), 
+		]]>
+		</isEmpty>
+		<![CDATA[
+			#tr_phone#, 
+			#tr_callback#, 
+			#tr_msg#
+		)			
+		]]>
+	</insert>
+	<insert id="insert_auto_sms" parameterClass="BaseVO">
+		<![CDATA[
+		insert into sc_tran
+			(TR_SENDDATE, TR_PHONE, TR_CALLBACK, TR_MSG)
+		values
+			(
+			now(), 
+			#tr_phone#, 
+			#tr_callback#, 
+			#tr_msg#
+		)
+		]]>
+	</insert>
+	<insert id="insert_mms" parameterClass="BaseVO">
+		<![CDATA[
+		INSERT INTO MMS_MSG 
+		(SUBJECT, PHONE, CALLBACK, STATUS, REQDATE, MSG, TYPE)
+		VALUES 
+		(
+		#tr_subject#
+		#tr_phone#, 
+		#tr_callback#, 
+		'0', 
+		]]>
+		<isNotEmpty property="tr_senddate">
+		<![CDATA[
+			#tr_senddate#, 
+		]]>
+		</isNotEmpty>		
+		<isEmpty property="tr_senddate">
+		<![CDATA[
+			now(), 
+		]]>
+		</isEmpty>
+		<![CDATA[
+		#tr_msg#,
+		'0'
+		)			
+		]]>
+	</insert>
+	<insert id="insert_auto_mms" parameterClass="BaseVO">
+		<![CDATA[
+		INSERT INTO MMS_MSG 
+		(SUBJECT, PHONE, CALLBACK, STATUS, REQDATE, MSG, TYPE)
+		VALUES 
+		(
+		 #tr_subject#,
+		 #tr_phone#, 
+		 #tr_callback#, 
+		 '0', 
+		 NOW(),
+		 #tr_msg#,
+		 '0'
+		 );
+		]]>
+	</insert>
+	<insert id="insert_sms_list" parameterClass="BaseVO">
+		<![CDATA[
+		insert into sc_tran_tb
+			(TR_SENDDATE, TR_PHONE, TR_CALLBACK, TR_MSG, SMS_TARGET, SMS_TYPE)
+		values
+			(
+			now(), 
+			#tr_phone#, 
+			#tr_callback#, 
+			#tr_msg#,
+			#sms_target#,
+			#sms_type#
+		)
+		]]>
+	</insert>
+	
+	<select id="get_fcm_info" parameterClass="BaseVO" resultClass="BaseVO">
+	<![CDATA[
+		select FCM_KEY from base_app_tb
+	]]>
+	</select>
+	
+	<select id="get_auto_cancel_reserve_list" parameterClass="BaseVO" resultClass="BaseVO">
+	<![CDATA[
+		select 
+			ORDER_ID,
+			ORDER_PAY_CD,
+			ORDER_TOTAL_PRICE
+		from base_order_tb
+		where 1
+			and ORDER_ST = 'READY'
+			and ORDER_PAY_TIME = #order_pay_time#
+			and REG_DT < #cancel_dt#
+			and ORDER_PAY_ST = 'V'
+		ORDER BY ORDER_SEQ asc
+	]]>
+	</select>
+	
+	<insert id="insert_cancel_reserve" parameterClass="BaseVO">
+		<![CDATA[
+		INSERT INTO base_cancel_reserve_tb 
+		(ORDER_ID, ORDER_TID, ORDER_PRICE, CANCEL_STATUS, REG_DT, RESULT_DT)
+		VALUES 
+		(
+		 #order_id#,
+		 #order_tid#,
+		 #order_price#,
+		 'N', 
+		 now(), 
+		 NUll
+		 );
+		]]>
+	</insert>
+	<select id="cancel_reserve_list" parameterClass="BaseVO" resultClass="BaseVO">
+	<![CDATA[
+		select 
+			ORDER_ID,
+			ORDER_TID,
+			ORDER_PRICE
+		from base_cancel_reserve_tb
+		where 1
+			and CANCEL_STATUS = 'N' 
+		ORDER BY CSEQ desc
+	]]>
+	</select>
+	<update id="cancel_reserve_update" parameterClass="BaseVO">
+	<![CDATA[
+		update base_cancel_reserve_tb set
+			CANCEL_STATUS = 'Y',
+			RESULT_DT = now()
+		where 1
+			and ORDER_ID = #order_id#
+	]]>
+	</update>
+	
+	
+</sqlMap>

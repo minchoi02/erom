@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseOrder">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrOrderVO" type="egovframework.admgrOrder.service.AdmgrOrderVO"/>
+
+	<!-- 주문목록 -->
+	<select id="get_order_list" parameterClass="AdmgrOrderVO" resultClass="AdmgrOrderVO">
+	<![CDATA[
+		select
+			om.ORDER_SEQ,               
+			om.ORDER_ID,
+			om.ORDER_USER_ID,
+			om.ORDER_USER_NM,          
+			om.ORDER_HP,
+			om.ORDER_TEL,
+			om.ORDER_EMAIL,
+			om.ORDER_ADDR_ID,
+			om.ORDER_ZIP,
+			om.ORDER_ADDR1,
+			om.ORDER_ADDR2,
+			om.ORDER_TOTAL_PRICE,
+			om.ORDER_USE_COUPON_ID,
+			om.ORDER_COUPON_PRICE,
+			om.ORDER_USE_MILEAGE,
+			om.ORDER_TOTAL_DELIVERY_PRICE,
+			om.ORDER_PAY_ST,
+			om.ORDER_PAY_CD,
+			om.ORDER_PAY_VBANK_CD,
+			om.ORDER_PAY_VBANK_NM,
+			om.ORDER_PAY_VBANK_NUMBER,
+			om.ORDER_PAY_VBANK_USER,
+			om.ORDER_PAY_TIME,
+			om.ORDER_PAY_STAT,
+			om.ORDER_ST,
+			om.ORDER_MEMO,
+			substr(om.REG_DT,1,19) as REG_DT
+		from base_order_tb om, base_order_prod_detail_tb od
+		where 1
+			and od.OD_ORDER_ID = om.ORDER_ID
+	]]>
+	<isNotEmpty property="searchKey">
+		<isEqual prepend="AND" property="searchKey" compareValue="order_id">
+		<![CDATA[
+			om.ORDER_ID like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+		<![CDATA[
+			od.OD_PROD_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_nm">
+		<![CDATA[
+			om.ORDER_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_hp">
+		<![CDATA[
+			om.ORDER_HP like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_nm">
+		<![CDATA[
+			od.OD_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_hp">
+		<![CDATA[
+			od.OD_USER_CALL like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="user_level">
+		<isEqual prepend="AND" property="user_level" compareValue="5">
+		<![CDATA[
+			od.OD_STORE_ID in $od_store_id$
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="order_st_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT >= #order_st_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_ed_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT <= #order_ed_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_st" prepend="AND">
+	<![CDATA[
+		om.ORDER_ST = #order_st#
+	]]>
+	</isNotEmpty>
+	<![CDATA[
+			group by om.ORDER_ID
+			order by om.REG_DT DESC
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+	]]>
+	</select>
+	
+	<!-- 주문수 -->
+	<select id="get_order_list_cnt" parameterClass="AdmgrOrderVO" resultClass="int">
+	<![CDATA[
+		select
+			COUNT(DISTINCT(om.ORDER_ID))
+		from base_order_tb om, base_order_prod_detail_tb od
+		where 1
+		and om.ORDER_ID = od.OD_ORDER_ID
+	]]>
+	<isNotEmpty property="searchKey">
+		<isEqual prepend="AND" property="searchKey" compareValue="order_id">
+		<![CDATA[
+			om.ORDER_ID like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+		<![CDATA[
+			od.OD_PROD_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_nm">
+		<![CDATA[
+			om.ORDER_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_hp">
+		<![CDATA[
+			om.ORDER_HP like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_nm">
+		<![CDATA[
+			od.OD_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_hp">
+		<![CDATA[
+			od.OD_USER_CALL like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="user_level">
+		<isEqual prepend="AND" property="user_level" compareValue="5">
+		<![CDATA[
+			od.OD_STORE_ID in $od_store_id$
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="order_st_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT >= #order_st_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_ed_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT <= #order_ed_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_st" prepend="AND">
+	<![CDATA[
+		om.ORDER_ST = #order_st#
+	]]>
+	</isNotEmpty>
+	</select>
+	
+	<!-- 주문정보 -->
+	<select id="get_order_master_info" parameterClass="AdmgrOrderVO" resultClass="AdmgrOrderVO">
+	<![CDATA[
+		select 
+			ORDER_SEQ,               
+			ORDER_ID,
+			ORDER_USER_ID,
+			ORDER_USER_NM,          
+			ORDER_HP,
+			ORDER_TEL,
+			ORDER_EMAIL,
+			ORDER_ADDR_ID,
+			ORDER_ZIP,
+			ORDER_ADDR1,
+			ORDER_ADDR2,
+			ORDER_TOTAL_PRICE,
+			ORDER_USE_COUPON_ID,
+			ORDER_COUPON_PRICE,
+			ORDER_USE_MILEAGE,
+			ORDER_TOTAL_DELIVERY_PRICE,
+			ORDER_PAY_ST,
+			ORDER_PAY_CD,
+			ORDER_PAY_VBANK_CD,
+			ORDER_PAY_VBANK_NM,
+			ORDER_PAY_VBANK_NUMBER,
+			ORDER_PAY_VBANK_USER,
+			ORDER_PAY_TIME,
+			ORDER_PAY_STAT,
+			ORDER_ST,
+			ORDER_PAY_DATE,
+			ORDER_CANCEL_DATE,
+			ORDER_MEMO,
+			substr(REG_DT,1,19) as REG_DT
+		from base_order_tb
+		where 1
+			and order_id = #order_id#
+	]]>
+	</select>
+	
+	<!-- 주문목록 -->
+	<select id="get_order_detail_list" parameterClass="AdmgrOrderVO" resultClass="AdmgrOrderVO">
+	<![CDATA[
+		select
+			om.ORDER_SEQ,               
+			om.ORDER_ID,
+			om.ORDER_USER_ID,
+			om.ORDER_USER_NM,          
+			om.ORDER_HP,
+			om.ORDER_TEL,
+			om.ORDER_EMAIL,
+			om.ORDER_ADDR_ID,
+			om.ORDER_ZIP,
+			om.ORDER_ADDR1,
+			om.ORDER_ADDR2,
+			om.ORDER_TOTAL_PRICE,
+			om.ORDER_PAY_DATE,
+			om.ORDER_CANCEL_DATE,
+			om.ORDER_ST,
+			substr(om.REG_DT,1,19) as REG_DT,
+			od.OD_SEQ,
+			od.OD_STORE_ID,
+			(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = od.OD_STORE_ID) as STORE_NM,
+			od.OD_PROD_ID,
+			od.OD_PROD_NM,
+			od.OD_ROOM_SEQ,
+			(select PROD_ROOM_NM from base_product_room_tb where base_product_room_tb.PROD_ROOM_SEQ = od.OD_ROOM_SEQ) as PROD_ROOM_NM,
+			od.OD_STORE_CATEGORY,
+			od.OD_PROD_CATEGORY,
+			od.OD_PROD_PRICE,
+			od.OD_PROD_PRICE_PERCENT,
+			od.OD_PROD_OPT_SEQ,
+			od.OD_PROD_OPT_NM,
+			od.OD_PROD_OPT_PRICE,
+			od.OD_PROD_OPT_CNT,
+			od.OD_PROD_TOTAL_PRICE,
+			od.OD_ST_DT,
+			od.OD_ED_DT,
+			od.OD_USER_NM,
+			od.OD_USER_CALL,
+			od.OD_ORDER_STAT,
+			od.OD_STAT,
+			substr(od.OD_END_DATE,1,19) as OD_END_DATE,
+			substr(od.OD_CANCELING_DT,1,19) as OD_CANCELING_DT,
+			od.OD_DELIVERY_COMPANY_ID,
+			(SELECT  base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD = od.OD_DELIVERY_COMPANY_ID) AS delivery_company_nm,
+			od.OD_DELIVERY_NUMBER,
+			(SELECT  base_store_tb.STORE_MARKET_DEFAULT_DELIVERY_PRICE FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_MARKET_DEFAULT_DELIVERY_PRICE,
+			(SELECT  base_store_tb.STORE_MARKET_FREE_DELIVERY_PRICE FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_MARKET_FREE_DELIVERY_PRICE,
+			(SELECT  base_store_tb.STORE_MARKET_JEJU_DELIVERY_PRICE FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_MARKET_JEJU_DELIVERY_PRICE,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_7 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_7,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_5 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_5,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_3 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_3,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_2 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_2,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_1 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_1,
+			(SELECT  base_store_tb.STORE_TRAVEL_RETURN_DAY_0 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_TRAVEL_RETURN_DAY_0,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_7 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_7,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_5 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_5,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_3 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_3,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_2 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_2,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_1 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_1,
+			(SELECT  base_store_tb.STORE_HOUSE_RETURN_DAY_0 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_HOUSE_RETURN_DAY_0,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_7 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_7,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_5 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_5,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_3 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_3,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_2 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_2,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_1 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_1,
+			(SELECT  base_store_tb.STORE_FOOD_RETURN_DAY_0 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS STORE_FOOD_RETURN_DAY_0,
+			(SELECT  base_store_tb.STORE_MARKET_DELIVERY_COMPANY_CD_1 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS delivery_company_cd1,
+			(SELECT  base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD = delivery_company_cd1) AS delivery_company_nm1,
+			(SELECT  base_store_tb.STORE_MARKET_DELIVERY_COMPANY_CD_2 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS delivery_company_cd2,
+			(SELECT  base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD = delivery_company_cd2) AS delivery_company_nm2,
+			(SELECT  base_store_tb.STORE_MARKET_DELIVERY_COMPANY_CD_3 FROM base_store_tb WHERE od.OD_STORE_ID = base_store_tb.STORE_ID) AS delivery_company_cd3,
+			(SELECT  base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD = delivery_company_cd3) AS delivery_company_nm3
+		from base_order_tb om, base_order_prod_detail_tb od
+		where 1
+			and od.OD_ORDER_ID = #od_order_id#
+			and od.OD_ORDER_ID = om.ORDER_ID
+	]]>
+	<isNotEmpty property="searchKey">
+		<isEqual prepend="AND" property="searchKey" compareValue="order_id">
+		<![CDATA[
+			om.ORDER_ID like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+		<![CDATA[
+			od.OD_PROD_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_nm">
+		<![CDATA[
+			om.ORDER_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_hp">
+		<![CDATA[
+			om.ORDER_HP like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_nm">
+		<![CDATA[
+			od.OD_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_hp">
+		<![CDATA[
+			od.OD_USER_CALL like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="order_st_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT >= #order_st_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_ed_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT <= #order_ed_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_st" prepend="AND">
+	<![CDATA[
+		om.ORDER_ST = #order_st#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="user_level">
+		<isEqual prepend="AND" property="user_level" compareValue="5">
+		<![CDATA[
+			od.OD_STORE_ID in $od_store_id$
+		]]>
+		</isEqual>
+	</isNotEmpty>			
+	<![CDATA[
+			order by 
+				od.OD_STORE_CATEGORY asc, 
+				od.OD_STORE_ID asc, 
+				od.OD_PROD_NM asc 
+	]]>
+	</select>
+
+<!-- 주문수 -->
+	<select id="get_order_detail_list_cnt" parameterClass="AdmgrOrderVO" resultClass="int">
+	<![CDATA[
+		select
+			count(*)
+		from base_order_tb om, base_order_prod_detail_tb od
+		where 1
+			and od.OD_ORDER_ID = #od_order_id#
+			and od.OD_ORDER_ID = om.ORDER_ID
+	]]>
+	<isNotEmpty property="searchKey">
+		<isEqual prepend="AND" property="searchKey" compareValue="order_id">
+		<![CDATA[
+			om.ORDER_ID like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+		<![CDATA[
+			od.OD_PROD_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_nm">
+		<![CDATA[
+			om.ORDER_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="order_hp">
+		<![CDATA[
+			om.ORDER_HP like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_nm">
+		<![CDATA[
+			od.OD_USER_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+		<isEqual prepend="AND" property="searchKey" compareValue="reserve_hp">
+		<![CDATA[
+			od.OD_USER_CALL like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="order_st_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT >= #order_st_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_ed_dt" prepend="AND">
+	<![CDATA[
+		om.REG_DT <= #order_ed_dt#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="order_st" prepend="AND">
+	<![CDATA[
+		om.ORDER_ST = #order_st#
+	]]>
+	</isNotEmpty>
+	<isNotEmpty property="user_level">
+		<isEqual prepend="AND" property="user_level" compareValue="5">
+		<![CDATA[
+			od.OD_STORE_ID in $od_store_id$
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	</select>
+	
+	<update id="update_master_payment" parameterClass="AdmgrOrderVO">
+	<![CDATA[
+		update base_order_tb set
+			ORDER_ST = #order_st#
+		where 1
+			and (ORDER_PAY_ST = 'B' or ORDER_PAY_ST = 'V')
+			and ORDER_ID = #order_id#
+	]]>
+	</update>
+	<update id="update_order_master" parameterClass="AdmgrOrderVO">
+	<![CDATA[
+		update base_order_tb set
+	]]>
+	<isNotEmpty property="user_level">
+		<isEqual property="user_level" compareValue="5">
+		<![CDATA[
+			ORDER_MEMO = #order_memo#,
+		]]>
+		</isEqual>
+	</isNotEmpty>
+	<isNotEmpty property="order_st">
+		<![CDATA[
+			ORDER_ST = #order_st#,
+		]]>
+	</isNotEmpty>
+	<![CDATA[
+			ORDER_PAY_DATE = #order_pay_date#,
+			ORDER_CANCEL_DATE = #order_cancel_date#
+		where 1
+			and ORDER_ID = #order_id#
+	]]>
+	</update>
+	
+	<update id="update_order_detail" parameterClass="AdmgrOrderVO">
+	<![CDATA[
+		update base_order_prod_detail_tb set
+			OD_STAT = #od_stat#,
+			OD_ORDER_STAT = #od_order_stat#,
+		]]>
+		<isNotEmpty property="od_delivery_number">
+		<![CDATA[
+			OD_DELIVERY_DT = now(),
+		]]>
+		</isNotEmpty>
+		<isEmpty property="od_delivery_number">
+		<![CDATA[
+			OD_DELIVERY_DT = null,
+		]]>
+		</isEmpty>
+		<isEqual property="od_order_stat" compareValue="CANCEL">
+		<![CDATA[
+			OD_CANCEL_DT = now(),
+		]]>
+		</isEqual>
+		<![CDATA[
+			OD_DELIVERY_COMPANY_ID = #od_delivery_company_id#,
+			OD_DELIVERY_NUMBER = #od_delivery_number#
+		where 1
+			and OD_SEQ = #od_seq#
+	]]>
+	</update>
+	
+	<select id="get_order_cancel_list" parameterClass="AdmgrOrderVO" resultClass="AdmgrOrderVO">
+	<![CDATA[
+		select
+			om.ORDER_USER_NM,
+			om.ORDER_PAY_ST,
+			substr(om.REG_DT,1,19) as REG_DT,
+			(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = od.OD_STORE_ID) as STORE_NM,
+			od.OD_SEQ,
+			od.OD_ORDER_ID,
+			od.OD_PROD_NM,
+			od.OD_PROD_PRICE,
+			substr(od.OD_CANCELING_DT,1,19) as OD_CANCELING_DT
+		from base_order_tb om, base_order_prod_detail_tb od
+		where 1
+			and od.OD_ORDER_ID = om.ORDER_ID
+			and od.OD_ORDER_STAT = 'CANCELING'
+	]]>
+	<isNotEmpty property="store_id">
+		<![CDATA[
+			and OD_STORE_ID = #store_id#
+		]]>
+	</isNotEmpty>
+	<![CDATA[
+		order by OD_CANCELING_DT desc
+	]]>
+	</select>
+	
+</sqlMap>

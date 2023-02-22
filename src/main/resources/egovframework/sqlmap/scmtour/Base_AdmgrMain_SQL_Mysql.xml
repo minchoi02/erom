@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="admgrMain">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrMainVO" type="egovframework.admgrMain.service.AdmgrMainVO"/>
+	
+	<select id="get_main_member_list" parameterClass="AdmgrMainVO" resultClass="AdmgrMainVO">
+		<![CDATA[
+		select 
+		USER_SEQ,
+		USER_JOIN_FL,
+		USER_ID,
+		USER_NM,
+		USER_LEVEL,
+		substr(REG_DT,1,19) as REG_DT 
+		from base_member_tb 
+		where 1 
+		order by REG_DT desc 
+		LIMIT #list_cnt# OFFSET 0
+		]]>
+	</select>
+	
+	<select id="get_main_order_list" parameterClass="AdmgrMainVO" resultClass="AdmgrMainVO">
+		<![CDATA[
+		select 
+		ORDER_SEQ,
+		ORDER_ID,
+		ORDER_USER_ID,
+		ORDER_USER_NM,
+		ORDER_ST,
+		ORDER_TOTAL_PRICE,
+		substr(REG_DT,1,19) as REG_DT
+		]]>
+	<isEmpty property="store_id">
+		<![CDATA[
+		from base_order_tb 
+		where 1 
+		]]>
+	</isEmpty>
+	<isNotEmpty property="store_id">
+		<![CDATA[
+		from base_order_tb, base_order_prod_detail_tb 
+		where 1 
+			and base_order_tb.ORDER_ID = base_order_prod_detail_tb.OD_ORDER_ID
+			and base_order_prod_detail_tb.OD_STORE_ID = #store_id#
+		]]>
+	</isNotEmpty>		
+		<![CDATA[
+		order by REG_DT desc 
+		LIMIT #list_cnt# OFFSET 0
+		]]>
+	</select>
+	
+	<select id="get_main_bbs_list" parameterClass="AdmgrMainVO" resultClass="AdmgrMainVO">
+		<![CDATA[
+		select 
+		BBS_SEQ,
+		BBS_ID,
+		BBS_SUBJECT,
+		BBS_WRITER_NM,
+		USER_ID,
+		(select USER_NM from base_member_tb where base_member_tb.USER_ID = base_bbs_tb.USER_ID) as USER_NM,
+		BBS_PROD_ID,
+		(select PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID) as PROD_NM,
+		BBS_CONTENT,
+		BBS_REPLY_CONTENT,
+		substr(REG_DT,1,19) as REG_DT,
+		BBS_STORE_ID,
+		(select STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID) as STORE_NM,
+		BBS_STORE_CATEGORY,
+		(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY) as STORE_CATEGORY_NM
+		from base_bbs_tb 
+		where 1 
+		and BBS_ID = #bbs_id#
+		]]>
+	<isNotEmpty property="store_id">
+		<![CDATA[
+		 and BBS_STORE_ID = #store_id#
+		]]>
+	</isNotEmpty>
+		<![CDATA[
+		and del_st = 'N'
+		order by REG_DT desc limit #list_cnt#
+		]]>
+	</select>
+	
+	<select id="get_main_product_list" parameterClass="AdmgrMainVO" resultClass="AdmgrMainVO">
+		<![CDATA[
+		select 
+		PROD_SEQ,
+		PROD_USE_ST,
+		STORE_NM,
+		PROD_NM,
+		STORE_CATEGORY,
+		(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.STORE_CATEGORY) as STORE_CATEGORY_NM,
+		substr(REG_DT,1,19) as REG_DT
+		from base_product_tb where 1 
+		]]>
+	<isNotEmpty property="store_id">
+		<![CDATA[
+		 and STORE_ID = #store_id#
+		]]>
+	</isNotEmpty>
+		<![CDATA[
+		order by REG_DT desc 
+		LIMIT #list_cnt# OFFSET 0
+		]]>
+	</select>
+	
+	<select id="get_main_store_list" parameterClass="AdmgrMainVO" resultClass="AdmgrMainVO">
+		<![CDATA[
+		select 
+		STORE_SEQ,
+		STORE_NM,
+		STORE_COMPANY_NM,
+		STORE_USE_ST,
+		substr(REG_DT,1,19) as REG_DT
+		from base_store_tb 
+		where 1 
+		order by REG_DT desc 
+		LIMIT #list_cnt# OFFSET 0
+		]]>
+	</select>
+	
+</sqlMap>

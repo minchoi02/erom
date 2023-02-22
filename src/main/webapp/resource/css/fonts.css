@@ -1,0 +1,221 @@
+@charset "utf-8";
+
+@import url('//fonts.googleapis.com/css?family=Montserrat:400,500,700');
+@import url('//fonts.googleapis.com/earlyaccess/nanummyeongjo.css');
+
+/* 
+ * Nanum Barun Gothic Web Fonts
+ * https://github.com/hiun/NanumBarunGothic
+ * Copyright (c) 2010, NAVER Corporation (http://www.nhncorp.com) 
+ */
+ 
+@font-face {
+  font-family: 'NBG';
+  font-style: normal;
+  font-weight: 200;
+  src: url(../fonts/NanumBarunGothicUltraLight.eot);
+  src: local('Nanum Barun Gothic UltraLight'),
+       local('NanumBarunGothicUltraLight'),
+       url(../fonts/NanumBarunGothicUltraLight.eot?#iefix) format('embedded-opentype'),
+       url(../fonts/NanumBarunGothicUltraLight.woff2) format('woff2'),
+       url(../fonts/NanumBarunGothicUltraLight.woff) format('woff'),
+       url(../fonts/NanumBarunGothicUltraLight.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'NBG';
+  font-style: normal;
+  font-weight: 300;
+  src: url(../fonts/NanumBarunGothicLight.eot);
+  src: local('Nanum Barun Gothic Light'),
+       local('NanumBarunGothicLight'),
+       url(../fonts/NanumBarunGothicLight.eot?#iefix) format('embedded-opentype'),
+       url(../fonts/NanumBarunGothicLight.woff2) format('woff2'),
+       url(../fonts/NanumBarunGothicLight.woff) format('woff'),
+       url(../fonts/NanumBarunGothicLight.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'NBG';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/NanumBarunGothic.eot);
+  src: local('NBG'),
+       local('NanumBarunGothic'),
+       url(../fonts/NanumBarunGothic.eot?#iefix) format('embedded-opentype'),
+       url(../fonts/NanumBarunGothic.woff2) format('woff2'),
+       url(../fonts/NanumBarunGothic.woff) format('woff'),
+       url(../fonts/NanumBarunGothic.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'NBG';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../fonts/NanumBarunGothicBold.eot);
+  src: local('Nanum Barun Gothic Bold'),
+       local('NanumBarunGothicBold'),
+       url(../fonts/NanumBarunGothicBold.eot?#iefix) format('embedded-opentype'),
+       url(../fonts/NanumBarunGothicBold.woff2) format('woff2'),
+       url(../fonts/NanumBarunGothicBold.woff) format('woff'),
+       url(../fonts/NanumBarunGothicBold.ttf) format('truetype');
+}
+
+/* Noto Sans */ 
+@font-face { 
+font-family: 'notokr'; 
+src: url('../fonts/notokr-light.eot'); 
+src: url('../fonts/notokr-light.eot?#iefix') format('embedded-opentype'), 
+url('../fonts/notokr-light.woff2') format('woff2'), 
+url('../fonts/notokr-light.woff') format('woff'), 
+url('../fonts/notokr-light.ttf') format('truetype'), 
+url('../fonts/notokr-light.svg#notokr-regular') format('svg'); 
+font-weight: 300; 
+font-style: normal; 
+}
+
+@font-face { 
+font-family: 'notokr'; 
+src: url('../fonts/notokr-regular.eot'); 
+src: url('../fonts/notokr-regular.eot?#iefix') format('embedded-opentype'), 
+url('../fonts/notokr-regular.woff2') format('woff2'), 
+url('../fonts/notokr-regular.woff') format('woff'), 
+url('../fonts/notokr-regular.ttf') format('truetype'), 
+url('../fonts/notokr-regular.svg#notokr-regular') format('svg'); 
+font-weight: 400; 
+font-style: normal; 
+}
+
+@font-face { 
+font-family: 'notokr'; 
+src: url('../fonts/notokr-bold.eot');
+src: url('../fonts/notokr-bold.eot?#iefix') format('embedded-opentype'),
+url('../fonts/notokr-bold.woff2') format('woff2'),
+url('../fonts/notokr-bold.woff') format('woff'),
+url('../fonts/notokr-bold.ttf') format('truetype'),
+url('../fonts/notokr-bold.svg#notokr-bold') format('svg');
+font-weight: 600; 
+font-style: normal;
+}
+@font-face {
+   font-family: 'Gmarket Sans';    font-style: normal;    font-weight: 700;
+   src: local('Gmarket Sans Bold'), local('GmarketSans-Bold'),
+   url('http://script.ebay.co.kr/fonts/GmarketSansBold.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+   url('http://script.ebay.co.kr/fonts/GmarketSansBold.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+@font-face {
+   font-family: 'Gmarket Sans';    font-style: normal;    font-weight: 500;
+   src: local('Gmarket Sans Medium'), local('GmarketSans-Medium'),
+   url('http://script.ebay.co.kr/fonts/GmarketSansMedium.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+   url('http://script.ebay.co.kr/fonts/GmarketSansMedium.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+@font-face {
+   font-family: 'Gmarket Sans';    font-style: normal;    font-weight: 300;
+   src: local('Gmarket Sans Light'), local('GmarketSans-Light'),
+   url('http://script.ebay.co.kr/fonts/GmarketSansLight.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+   url('http://script.ebay.co.kr/fonts/GmarketSansLight.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+@font-face {
+    font-family: 'S-CoreDream1';
+    src: url('../fonts/S-CoreDream-2ExtraLight.eot');
+    src: url('../fonts/S-CoreDream-2ExtraLight.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-2ExtraLight.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-2ExtraLight.woff') format('woff'),
+        url('../fonts/S-CoreDream-2ExtraLight.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-2ExtraLight.svg#S-CoreDream-2ExtraLight') format('svg');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-3Light.eot');
+    src: url('../fonts/S-CoreDream-3Light.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-3Light.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-3Light.woff') format('woff'),
+        url('../fonts/S-CoreDream-3Light.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-3Light.svg#S-CoreDream-3Light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-4Regular.eot');
+    src: url('../fonts/S-CoreDream-4Regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-4Regular.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-4Regular.woff') format('woff'),
+        url('../fonts/S-CoreDream-4Regular.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-4Regular.svg#S-CoreDream-4Regular') format('svg');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-5Medium.eot');
+    src: url('../fonts/S-CoreDream-5Medium.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-5Medium.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-5Medium.woff') format('woff'),
+        url('../fonts/S-CoreDream-5Medium.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-5Medium.svg#S-CoreDream-5Medium') format('svg');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-6Bold.eot');
+    src: url('../fonts/S-CoreDream-6Bold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-6Bold.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-6Bold.woff') format('woff'),
+        url('../fonts/S-CoreDream-6Bold.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-6Bold.svg#S-CoreDream-6Bold') format('svg');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-7ExtraBold.eot');
+    src: url('../fonts/S-CoreDream-7ExtraBold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-7ExtraBold.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-7ExtraBold.woff') format('woff'),
+        url('../fonts/S-CoreDream-7ExtraBold.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-7ExtraBold.svg#S-CoreDream-7ExtraBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-8Heavy.eot');
+    src: url('../fonts/S-CoreDream-8Heavy.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-8Heavy.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-8Heavy.woff') format('woff'),
+        url('../fonts/S-CoreDream-8Heavy.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-8Heavy.svg#S-CoreDream-8Heavy') format('svg');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('../fonts/S-CoreDream-9Black.eot');
+    src: url('../fonts/S-CoreDream-9Black.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/S-CoreDream-9Black.woff2') format('woff2'),
+        url('../fonts/S-CoreDream-9Black.woff') format('woff'),
+        url('../fonts/S-CoreDream-9Black.ttf') format('truetype'),
+        url('../fonts/S-CoreDream-9Black.svg#S-CoreDream-9Black') format('svg');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}

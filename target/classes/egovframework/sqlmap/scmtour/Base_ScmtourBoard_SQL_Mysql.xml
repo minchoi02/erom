@@ -1,0 +1,921 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseBoard">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseBoardVO" type="egovframework.base.board.service.BaseBoardVO"/>
+
+	<select id="get_main_slide" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				SLIDE_SEQ, 
+				SLIDE_SUBJECT, 
+				SLIDE_LINK, 
+				SLIDE_TARGET, 
+				substr(SLIDE_ST_DT,1,16) as SLIDE_ST_DT, 
+				substr(SLIDE_ST_DT,1,10) as SLIDE_ST_DT_YMD, 
+				substr(SLIDE_ST_DT,12,2) as SLIDE_ST_DT_HOUR, 
+				substr(SLIDE_ST_DT,15,2) as SLIDE_ST_DT_MINUTE, 
+				substr(SLIDE_ED_DT,1,16) as SLIDE_ED_DT, 
+				substr(SLIDE_ED_DT,1,10) as SLIDE_ED_DT_YMD, 
+				substr(SLIDE_ED_DT,12,2) as SLIDE_ED_DT_HOUR, 
+				substr(SLIDE_ED_DT,15,2) as SLIDE_ED_DT_MINUTE, 
+				SLIDE_USE_ST,
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS,
+				SLIDE_IMG 
+			from base_marketing_slide_tb
+			where 1 
+				and SLIDE_USE_ST = 'Y'
+				and SLIDE_ST_DT <= now()
+				and SLIDE_ED_DT >= now()
+			
+			limit #sql_limit#
+		]]>
+	</select>
+	<select id="get_main_slide_cnt" parameterClass="BaseBoardVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_marketing_slide_tb
+			where 1 
+				and SLIDE_USE_ST = 'Y'
+				and SLIDE_ST_DT <= now()
+				and SLIDE_ED_DT >= now()
+			
+			limit #sql_limit#
+		]]>
+	</select>
+	
+	<select id="get_week" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_marketing_week_tb.WEEK_SEQ, 
+				base_marketing_week_tb.STORE_CATEGORY, 
+				base_marketing_week_tb.PROD_ID, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,16) as WEEK_ST_DT, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,10) as WEEK_ST_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,12,2) as WEEK_ST_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,15,2) as WEEK_ST_DT_MINUTE, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,16) as WEEK_ED_DT, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,10) as WEEK_ED_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,12,2) as WEEK_ED_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,15,2) as WEEK_ED_DT_MINUTE, 
+				base_marketing_week_tb.WEEK_USE_ST,
+				substr(base_marketing_week_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_week_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_week_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_SEQ, 
+				base_product_tb.PROD_ID, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				base_product_tb.PROD_COMMENT,
+				base_product_tb.PROD_PRICE,
+				base_product_tb.PROD_PRICE_PERCENT,
+				base_product_tb.PROD_MIN_PRICE,
+				base_product_tb.PROD_CATEGORY,
+				base_product_tb.PROD_HIT_CNT,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM
+			from base_marketing_week_tb LEFT JOIN base_product_tb 
+			ON base_marketing_week_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+				and base_marketing_week_tb.WEEK_USE_ST = 'Y'
+				and base_marketing_week_tb.WEEK_ST_DT <= now()
+				and base_marketing_week_tb.WEEK_ED_DT >= now()
+				and base_marketing_week_tb.STORE_CATEGORY = 'CD002004'
+			order by rand()
+			limit #sql_limit#
+			
+		]]>
+	</select>
+	<select id="get_week_cnt" parameterClass="BaseBoardVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_marketing_week_tb LEFT JOIN base_product_tb 
+			ON base_marketing_week_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+				and base_marketing_week_tb.WEEK_USE_ST = 'Y'
+				and base_marketing_week_tb.WEEK_ST_DT <= now()
+				and base_marketing_week_tb.WEEK_ED_DT >= now()
+				and base_marketing_week_tb.STORE_CATEGORY = #store_category#
+			order by rand()
+			limit #sql_limit#
+		]]>
+	</select>
+	
+	<select id="get_main_item" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_marketing_main_product_tb.MAIN_SEQ, 
+				base_marketing_main_product_tb.STORE_CATEGORY, 
+				base_marketing_main_product_tb.PROD_ID, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,16) as MAIN_ST_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,10) as MAIN_ST_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,12,2) as MAIN_ST_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,15,2) as MAIN_ST_DT_MINUTE, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,16) as MAIN_ED_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,10) as MAIN_ED_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,12,2) as MAIN_ED_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,15,2) as MAIN_ED_DT_MINUTE, 
+				base_marketing_main_product_tb.MAIN_USE_ST,
+				substr(base_marketing_main_product_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_main_product_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_main_product_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_SEQ, 
+				base_product_tb.PROD_ID, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				base_product_tb.PROD_COMMENT,
+				base_product_tb.PROD_PRICE,
+				base_product_tb.PROD_PRICE_PERCENT,
+				base_product_tb.PROD_MIN_PRICE,
+				base_product_tb.PROD_CATEGORY,
+				base_product_tb.PROD_HIT_CNT,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM,
+				(select count(*) from base_favorite_prod_tb where USER_ID=#user_id# AND PROD_ID=base_marketing_main_product_tb.PROD_ID) AS is_fav
+			from base_marketing_main_product_tb LEFT JOIN base_product_tb 
+			ON base_marketing_main_product_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+				and base_marketing_main_product_tb.MAIN_USE_ST = 'Y'
+				and base_marketing_main_product_tb.MAIN_ST_DT <= now()
+				and base_marketing_main_product_tb.MAIN_ED_DT >= now()
+				and base_marketing_main_product_tb.STORE_CATEGORY = #store_category#
+			order by rand()
+			limit #sql_limit#
+		]]>
+	</select>
+	<select id="get_main_item_cnt" parameterClass="BaseBoardVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_marketing_main_product_tb LEFT JOIN base_product_tb 
+			ON base_marketing_main_product_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+				and base_marketing_main_product_tb.MAIN_USE_ST = 'Y'
+				and base_marketing_main_product_tb.MAIN_ST_DT <= now()
+				and base_marketing_main_product_tb.MAIN_ED_DT >= now()
+				and base_marketing_main_product_tb.STORE_CATEGORY = #store_category#
+			order by rand()
+			limit #sql_limit#
+		]]>
+	</select>
+	<select id="get_bbs_promotion" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_bbs_tb.BBS_SEQ,
+				base_bbs_tb.BBS_ID,
+				base_bbs_tb.USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+				base_bbs_tb.BBS_WRITER_NM,
+				base_bbs_tb.BBS_WRITER_PWD,
+				base_bbs_tb.BBS_WRITER_EMAIL,
+				base_bbs_tb.BBS_WRITER_HP,
+				base_bbs_tb.BBS_CATEGORY,
+				base_bbs_tb.BBS_NOTICE_ST,
+				base_bbs_tb.BBS_SECURE_ST,
+				base_bbs_tb.BBS_SUBJECT,
+				base_bbs_tb.BBS_CONTENT,
+				base_bbs_tb.BBS_REPLY_USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+				base_bbs_tb.BBS_REPLY_SUBJECT,
+				base_bbs_tb.BBS_REPLY_CONTENT,
+				base_bbs_tb.BBS_HIT_CNT,
+				base_bbs_tb.BBS_FILE1,
+				base_bbs_tb.BBS_FILE2,
+				base_bbs_tb.BBS_LINK,
+				substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+				base_bbs_tb.DEL_ST,
+				substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+				substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+				substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+				base_bbs_tb.REPLY_DEL_ST,
+				(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+				base_bbs_tb.BBS_STORE_ID,
+				(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+				(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+				base_bbs_tb.BBS_PROD_ID,
+				(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+				base_bbs_tb.BBS_STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_bbs_tb.BBS_CP1,
+				base_bbs_tb.BBS_CP2,
+				base_bbs_tb.BBS_CP3,
+				base_bbs_tb.BBS_CP4,
+				base_bbs_tb.BBS_CP5,
+				base_bbs_tb.BBS_CP6,
+				base_bbs_tb.BBS_CP7,
+				base_bbs_tb.BBS_CP8,
+				base_bbs_tb.BBS_CP9,
+				base_bbs_tb.BBS_CP10,
+				substr(BBS_ST_DT,1,16) as BBS_ST_DT, 
+				substr(BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+				substr(BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+				substr(BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+				substr(BBS_ED_DT,1,16) as BBS_ED_DT, 
+				substr(BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+				substr(BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+				substr(BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+				BBS_USE_DATE,
+				base_bbs_tb.BBS_STAR	,
+				CASE
+					WHEN (NOW() > BBS_ED_DT) THEN 'E'
+					WHEN (NOW() < BBS_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as BBS_DATE_STATUS		
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+			and base_bbs_tb.BBS_ID = #bbs_id#
+			and base_bbs_tb.BBS_USE_DATE = 'Y'
+			and base_bbs_tb.BBS_NOTICE_ST = 'N'
+			and base_bbs_tb.BBS_ST_DT < now()
+			and base_bbs_tb.BBS_ED_DT > now()
+			order by rand()
+			limit #sql_limit#
+		]]>
+	</select>
+	<select id="get_bbs_promotion_cnt" parameterClass="BaseBoardVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)		
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+			and base_bbs_tb.BBS_ID = #bbs_id#
+			and base_bbs_tb.BBS_USE_DATE = 'Y'
+			and base_bbs_tb.BBS_NOTICE_ST = 'N'
+			and base_bbs_tb.BBS_ST_DT < now()
+			and base_bbs_tb.BBS_ED_DT > now()
+			order by rand()
+			limit #sql_limit#
+		]]>
+	</select>
+	
+	<select id="get_banner" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				BANNER_SEQ, 
+				BANNER_ZONE_1, 
+				BANNER_ZONE_2, 
+				BANNER_ZONE_3, 
+				BANNER_SUBJECT, 
+				BANNER_LINK, 
+				BANNER_TARGET, 
+				substr(BANNER_ST_DT,1,16) as BANNER_ST_DT, 
+				substr(BANNER_ST_DT,1,10) as BANNER_ST_DT_YMD, 
+				substr(BANNER_ST_DT,12,2) as BANNER_ST_DT_HOUR, 
+				substr(BANNER_ST_DT,15,2) as BANNER_ST_DT_MINUTE, 
+				substr(BANNER_ED_DT,1,16) as BANNER_ED_DT, 
+				substr(BANNER_ED_DT,1,10) as BANNER_ED_DT_YMD, 
+				substr(BANNER_ED_DT,12,2) as BANNER_ED_DT_HOUR, 
+				substr(BANNER_ED_DT,15,2) as BANNER_ED_DT_MINUTE, 
+				BANNER_USE_ST,
+				BANNER_IMG,
+				substr(REG_DT,1,19) as REG_DT,
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS
+			from base_marketing_banner_tb
+			where 1 
+				and BANNER_USE_ST = 'Y'
+		]]>
+		<isEqual property="banner_zone_1" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_1 = 'Y'
+		]]>
+		</isEqual>
+		<isEqual property="banner_zone_2" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_2 = 'Y'
+		]]>
+		</isEqual>
+		<isEqual property="banner_zone_3" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_3 = 'Y'
+		]]>
+		</isEqual>
+				
+		<![CDATA[
+				and BANNER_ST_DT <= now()
+				and BANNER_ED_DT >= now()
+			
+			limit #sql_limit#
+		]]>
+	</select>
+	
+	<select id="get_index_banner" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				BANNER_SEQ, 
+				BANNER_ZONE_1, 
+				BANNER_ZONE_2, 
+				BANNER_ZONE_3, 
+				BANNER_SUBJECT, 
+				BANNER_LINK, 
+				BANNER_TARGET, 
+				substr(BANNER_ST_DT,1,16) as BANNER_ST_DT, 
+				substr(BANNER_ST_DT,1,10) as BANNER_ST_DT_YMD, 
+				substr(BANNER_ST_DT,12,2) as BANNER_ST_DT_HOUR, 
+				substr(BANNER_ST_DT,15,2) as BANNER_ST_DT_MINUTE, 
+				substr(BANNER_ED_DT,1,16) as BANNER_ED_DT, 
+				substr(BANNER_ED_DT,1,10) as BANNER_ED_DT_YMD, 
+				substr(BANNER_ED_DT,12,2) as BANNER_ED_DT_HOUR, 
+				substr(BANNER_ED_DT,15,2) as BANNER_ED_DT_MINUTE, 
+				BANNER_USE_ST,
+				BANNER_IMG,
+				substr(REG_DT,1,19) as REG_DT,
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS
+			from base_marketing_banner_tb
+			where 1 
+				and BANNER_USE_ST = 'Y'
+		]]>
+		<isEqual property="banner_zone_1" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_1 = 'Y'
+		]]>
+		</isEqual>
+		<isEqual property="banner_zone_2" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_2 = 'Y'
+		]]>
+		</isEqual>
+		<isEqual property="banner_zone_3" compareValue="Y" prepend="AND">
+		<![CDATA[
+				BANNER_ZONE_3 = 'Y'
+		]]>
+		</isEqual>
+		<isNotEmpty property="seq_nm" prepend="AND">
+		<![CDATA[
+			BANNER_SEQ = #seq_nm#
+		]]>
+		</isNotEmpty>		
+				
+		<![CDATA[
+				and BANNER_ST_DT <= now()
+				and BANNER_ED_DT >= now()
+			
+			limit #sql_limit#
+		]]>
+	</select>	
+	
+
+	<select id="get_site_review_cnt" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			SELECT 
+				COUNT(*) AS total_cnt,
+				IFNULL(SUM(bbs_star), 0) AS total_star,
+				(SELECT COUNT(*) FROM base_bbs_tb WHERE bbs_id='REVIEW' AND bbs_prod_id = #bbs_prod_id# AND bbs_star = 5) AS star5_cnt,
+				(SELECT COUNT(*) FROM base_bbs_tb WHERE bbs_id='REVIEW' AND bbs_prod_id = #bbs_prod_id# AND bbs_star = 4) AS star4_cnt,
+				(SELECT COUNT(*) FROM base_bbs_tb WHERE bbs_id='REVIEW' AND bbs_prod_id = #bbs_prod_id# AND bbs_star = 3) AS star3_cnt,
+				(SELECT COUNT(*) FROM base_bbs_tb WHERE bbs_id='REVIEW' AND bbs_prod_id = #bbs_prod_id# AND bbs_star = 2) AS star2_cnt,
+				(SELECT COUNT(*) FROM base_bbs_tb WHERE bbs_id='REVIEW' AND bbs_prod_id = #bbs_prod_id# AND bbs_star = 1) AS star1_cnt
+			FROM base_bbs_tb
+			WHERE 1
+			   	and DEL_ST = 'N'
+				and BBS_ID = 'REVIEW'
+				and BBS_PROD_ID = #bbs_prod_id#
+		]]>
+	</select>
+
+	<select id="get_site_bbs_list" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_bbs_tb.BBS_SEQ,
+				base_bbs_tb.BBS_ID,
+				base_bbs_tb.USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+				base_bbs_tb.BBS_WRITER_NM,
+				base_bbs_tb.BBS_WRITER_PWD,
+				base_bbs_tb.BBS_WRITER_EMAIL,
+				base_bbs_tb.BBS_WRITER_HP,
+				base_bbs_tb.BBS_CATEGORY,
+				base_bbs_tb.BBS_NOTICE_ST,
+				base_bbs_tb.BBS_SECURE_ST,
+				base_bbs_tb.BBS_SUBJECT,
+				base_bbs_tb.BBS_CONTENT,
+				base_bbs_tb.BBS_REPLY_USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+				base_bbs_tb.BBS_REPLY_SUBJECT,
+				base_bbs_tb.BBS_REPLY_CONTENT,
+				base_bbs_tb.BBS_HIT_CNT,
+				base_bbs_tb.BBS_FILE1,
+				base_bbs_tb.BBS_FILE2,
+				base_bbs_tb.BBS_LINK,
+				substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_bbs_tb.REG_DT,1,10) as REG_DT_YMD,
+				substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+				base_bbs_tb.DEL_ST,
+				substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+				substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+				substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+				base_bbs_tb.REPLY_DEL_ST,
+				(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+				base_bbs_tb.BBS_STORE_ID,
+				(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+				(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+				base_bbs_tb.BBS_PROD_ID,
+				(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+				base_bbs_tb.BBS_STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_bbs_tb.BBS_CP1,
+				base_bbs_tb.BBS_CP2,
+				base_bbs_tb.BBS_CP3,
+				base_bbs_tb.BBS_CP4,
+				base_bbs_tb.BBS_CP5,
+				base_bbs_tb.BBS_CP6,
+				base_bbs_tb.BBS_CP7,
+				base_bbs_tb.BBS_CP8,
+				base_bbs_tb.BBS_CP9,
+				base_bbs_tb.BBS_CP10,
+				substr(base_bbs_tb.BBS_ST_DT,1,16) as BBS_ST_DT, 
+				substr(base_bbs_tb.BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+				substr(base_bbs_tb.BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+				substr(base_bbs_tb.BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+				substr(base_bbs_tb.BBS_ED_DT,1,16) as BBS_ED_DT, 
+				substr(base_bbs_tb.BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+				substr(base_bbs_tb.BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+				substr(base_bbs_tb.BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+				base_bbs_tb.BBS_USE_DATE,
+				base_bbs_tb.BBS_STAR	,
+				CASE
+					WHEN (NOW() > BBS_ED_DT) THEN 'E'
+					WHEN (NOW() < BBS_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as BBS_DATE_STATUS		
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+			and base_bbs_tb.BBS_ID = #bbs_id#
+		]]>
+		<isNotEmpty property="bbs_notice_st" prepend="AND">
+		<![CDATA[
+			base_bbs_tb.BBS_NOTICE_ST = #bbs_notice_st#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="user_id" prepend="AND">
+		<![CDATA[
+			base_bbs_tb.USER_ID = #user_id#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword" prepend="AND">
+		<![CDATA[
+			base_bbs_tb.BBS_SUBJECT like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_prod_id" prepend="AND">
+		<![CDATA[
+			base_bbs_tb.BBS_PROD_ID = #bbs_prod_id#
+		]]>
+		</isNotEmpty>
+		<isEqual property="bbs_id" compareValue="EVENT">
+			<isEqual property="bbs_use" compareValue="Y">
+			<![CDATA[
+			and now() > base_bbs_tb.BBS_ST_DT 
+			and now() < base_bbs_tb.BBS_ED_DT 
+			and base_bbs_tb.bbs_use_date = 'Y'
+			order by base_bbs_tb.BBS_ED_DT asc
+			]]>
+			</isEqual>
+			<isEqual property="bbs_use" compareValue="N">
+			<![CDATA[
+			and now() > base_bbs_tb.BBS_ED_DT 
+			order by base_bbs_tb.BBS_ED_DT desc
+			]]>
+			</isEqual>
+		</isEqual>
+		<isEqual property="bbs_id" compareValue="NOTICE">
+		<![CDATA[
+		order by base_bbs_tb.REG_DT desc
+		]]>
+		</isEqual>
+		<isEqual property="bbs_id" compareValue="MTM">
+		<![CDATA[
+		and USER_ID = #user_id#
+		order by base_bbs_tb.REG_DT desc
+		]]>
+		</isEqual>
+		<isEqual property="bbs_id" compareValue="QNA">
+		<![CDATA[
+		order by base_bbs_tb.REG_DT desc
+		]]>
+		</isEqual>
+		<isEqual property="bbs_id" compareValue="REVIEW">
+		<![CDATA[
+		order by base_bbs_tb.REG_DT desc
+		]]>
+		</isEqual>
+		<![CDATA[
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<select id="get_site_bbs_limit_list" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_bbs_tb.BBS_SEQ,
+				base_bbs_tb.BBS_ID,
+				base_bbs_tb.USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+				base_bbs_tb.BBS_WRITER_NM,
+				base_bbs_tb.BBS_WRITER_PWD,
+				base_bbs_tb.BBS_WRITER_EMAIL,
+				base_bbs_tb.BBS_WRITER_HP,
+				base_bbs_tb.BBS_CATEGORY,
+				base_bbs_tb.BBS_NOTICE_ST,
+				base_bbs_tb.BBS_SECURE_ST,
+				base_bbs_tb.BBS_SUBJECT,
+				base_bbs_tb.BBS_CONTENT,
+				base_bbs_tb.BBS_REPLY_USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+				base_bbs_tb.BBS_REPLY_SUBJECT,
+				base_bbs_tb.BBS_REPLY_CONTENT,
+				base_bbs_tb.BBS_HIT_CNT,
+				base_bbs_tb.BBS_FILE1,
+				base_bbs_tb.BBS_FILE2,
+				base_bbs_tb.BBS_LINK,
+				substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_bbs_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+				base_bbs_tb.DEL_ST,
+				substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+				substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+				substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+				base_bbs_tb.REPLY_DEL_ST,
+				(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+				base_bbs_tb.BBS_STORE_ID,
+				(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+				(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+				base_bbs_tb.BBS_PROD_ID,
+				(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+				base_bbs_tb.BBS_STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_bbs_tb.BBS_CP1,
+				base_bbs_tb.BBS_CP2,
+				base_bbs_tb.BBS_CP3,
+				base_bbs_tb.BBS_CP4,
+				base_bbs_tb.BBS_CP5,
+				base_bbs_tb.BBS_CP6,
+				base_bbs_tb.BBS_CP7,
+				base_bbs_tb.BBS_CP8,
+				base_bbs_tb.BBS_CP9,
+				base_bbs_tb.BBS_CP10,
+				substr(BBS_ST_DT,1,16) as BBS_ST_DT, 
+				substr(BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+				substr(BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+				substr(BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+				substr(BBS_ED_DT,1,16) as BBS_ED_DT, 
+				substr(BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+				substr(BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+				substr(BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+				BBS_USE_DATE,
+				base_bbs_tb.BBS_STAR	,
+				CASE
+					WHEN (NOW() > BBS_ED_DT) THEN 'E'
+					WHEN (NOW() < BBS_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as BBS_DATE_STATUS		
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+			and base_bbs_tb.BBS_ID = #bbs_id#
+			and base_bbs_tb.BBS_NOTICE_ST = 'N'
+		]]>
+		<isNotEmpty property="bbs_prod_id" prepend="AND">
+		<![CDATA[
+			BBS_PROD_ID = #bbs_prod_id#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="user_id">
+		<![CDATA[
+			and base_bbs_tb.USER_ID = #user_id#
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			order by base_bbs_tb.REG_DT desc
+			LIMIT #sql_limit#
+		]]>
+	</select>
+	
+	<select id="get_site_bbs_list_cnt" parameterClass="BaseBoardVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)	
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+			and base_bbs_tb.BBS_ID = #bbs_id#
+			and base_bbs_tb.BBS_NOTICE_ST = 'N'
+		]]>
+		<isNotEmpty property="user_id">
+		<![CDATA[
+			and base_bbs_tb.USER_ID = #user_id#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_prod_id">
+		<![CDATA[
+			and base_bbs_tb.BBS_PROD_ID = #bbs_prod_id#
+		]]>
+		</isNotEmpty>		
+		<![CDATA[
+		]]>
+	</select>
+	
+	<!--  bbs 등록 -->
+	<insert id="insert_site_bbs" parameterClass="BaseBoardVO">
+		<![CDATA[
+		insert into base_bbs_tb
+			(
+			BBS_ID,USER_ID,
+			BBS_WRITER_NM,BBS_WRITER_PWD,BBS_WRITER_EMAIL,BBS_WRITER_HP,
+			BBS_CATEGORY,
+			BBS_NOTICE_ST,BBS_SECURE_ST,
+			BBS_SUBJECT,BBS_CONTENT,
+			BBS_REPLY_SUBJECT,BBS_REPLY_CONTENT,
+			BBS_HIT_CNT,BBS_FILE1,BBS_FILE2,BBS_LINK,
+			REG_DT,MOD_DT,DEL_ST,
+			BBS_STORE_ID, BBS_PROD_ID, BBS_STORE_CATEGORY,
+			REPLY_REG_DT,REPLY_MOD_DT,REPLY_DEL_ST,
+			BBS_CP1, BBS_CP2, BBS_CP3, BBS_CP4, BBS_CP5, BBS_CP6, BBS_CP7, BBS_CP8, BBS_CP9, BBS_CP10,
+			BBS_ST_DT, BBS_ED_DT, BBS_USE_DATE, BBS_STAR
+			)
+		values
+			(
+			#bbs_id#,#user_id#,
+			#bbs_writer_nm#,#bbs_writer_pwd#,#bbs_writer_email#,#bbs_writer_hp#,
+			#bbs_category#,
+			#bbs_notice_st#,#bbs_secure_st#,
+			#bbs_subject#,#bbs_content#,
+			#bbs_reply_subject#,#bbs_reply_content#,
+			0,#bbs_file1#,#bbs_file2#,#bbs_link#,
+			now(),now(),'N',
+			#bbs_store_id#, 	#bbs_prod_id#, 	#bbs_store_category#,
+			#reply_reg_dt#,#reply_mod_dt#,#reply_del_st#,
+			#bbs_cp1#,#bbs_cp2#,#bbs_cp3#,#bbs_cp4#,#bbs_cp5#,#bbs_cp6#,#bbs_cp7#,#bbs_cp8#,#bbs_cp9#,#bbs_cp10#,
+			#bbs_st_dt#, #bbs_ed_dt#, #bbs_use_date#, #bbs_star#
+			)
+		]]>
+		<selectKey type="post" keyProperty="insert_id" resultClass="int">
+		<![CDATA[
+			select LAST_INSERT_ID() as insert_id
+		]]>
+		</selectKey>
+	</insert>
+	
+	<select id="get_site_bbs_info" parameterClass="BaseBoardVO" resultClass="BaseBoardVO">
+		<![CDATA[
+			select 
+				base_bbs_tb.BBS_SEQ,
+				base_bbs_tb.BBS_ID,
+				base_bbs_tb.USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+				base_bbs_tb.BBS_WRITER_NM,
+				base_bbs_tb.BBS_WRITER_PWD,
+				base_bbs_tb.BBS_WRITER_EMAIL,
+				base_bbs_tb.BBS_WRITER_HP,
+				base_bbs_tb.BBS_CATEGORY,
+				base_bbs_tb.BBS_NOTICE_ST,
+				base_bbs_tb.BBS_SECURE_ST,
+				base_bbs_tb.BBS_SUBJECT,
+				base_bbs_tb.BBS_CONTENT,
+				base_bbs_tb.BBS_REPLY_USER_ID,
+				(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+				base_bbs_tb.BBS_REPLY_SUBJECT,
+				base_bbs_tb.BBS_REPLY_CONTENT,
+				base_bbs_tb.BBS_HIT_CNT,
+				base_bbs_tb.BBS_FILE1,
+				base_bbs_tb.BBS_FILE2,
+				base_bbs_tb.BBS_LINK,
+				substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_bbs_tb.REG_DT,1,10) as REG_DT_YMD,
+				substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+				base_bbs_tb.DEL_ST,
+				substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+				substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+				substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+				base_bbs_tb.REPLY_DEL_ST,
+				(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+				base_bbs_tb.BBS_STORE_ID,
+				(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+				(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+				base_bbs_tb.BBS_PROD_ID,
+				(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+				base_bbs_tb.BBS_STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_bbs_tb.BBS_CP1,
+				base_bbs_tb.BBS_CP2,
+				base_bbs_tb.BBS_CP3,
+				base_bbs_tb.BBS_CP4,
+				base_bbs_tb.BBS_CP5,
+				base_bbs_tb.BBS_CP6,
+				base_bbs_tb.BBS_CP7,
+				base_bbs_tb.BBS_CP8,
+				base_bbs_tb.BBS_CP9,
+				base_bbs_tb.BBS_CP10,
+				substr(BBS_ST_DT,1,16) as BBS_ST_DT, 
+				substr(BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+				substr(BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+				substr(BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+				substr(BBS_ED_DT,1,16) as BBS_ED_DT, 
+				substr(BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+				substr(BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+				substr(BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+				BBS_USE_DATE,
+				base_bbs_tb.BBS_STAR	,
+				CASE
+					WHEN (NOW() > BBS_ED_DT) THEN 'E'
+					WHEN (NOW() < BBS_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as BBS_DATE_STATUS		
+			from base_bbs_tb
+			where 1 
+			and base_bbs_tb.DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="bbs_use_date" >
+		<![CDATA[
+			and BBS_USE_DATE = #bbs_use_date#
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			and base_bbs_tb.BBS_ID = #bbs_id#
+			and base_bbs_tb.BBS_SEQ = #bbs_seq#
+		]]>
+	</select>
+	
+	<!--  bbs 수정 -->
+	<update id="update_site_bbs" parameterClass="BaseBoardVO">
+		<![CDATA[
+		update base_bbs_tb set
+		]]>
+		<isNotEmpty property="bbs_writer_nm">
+			<![CDATA[
+			BBS_WRITER_NM = #bbs_writer_nm#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_pwd">
+			<![CDATA[
+			BBS_WRITER_PWD = #bbs_writer_pwd#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_email">
+			<![CDATA[
+			BBS_WRITER_EMAIL = #bbs_writer_email#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_hp">
+			<![CDATA[
+			BBS_WRITER_HP = #bbs_writer_hp#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_category">
+			<![CDATA[
+			BBS_CATEGORY = #bbs_category#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_notice_st">
+			<![CDATA[
+			BBS_NOTICE_ST = #bbs_notice_st#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_secure_st">
+			<![CDATA[
+			BBS_SECURE_ST = #bbs_secure_st#,
+			]]>
+		</isNotEmpty>		
+		<isNotEmpty property="bbs_subject">
+			<![CDATA[
+			BBS_SUBJECT = #bbs_subject#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_content">
+			<![CDATA[
+			BBS_CONTENT = #bbs_content#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_user_id">
+			<![CDATA[
+			BBS_REPLY_USER_ID = #bbs_reply_user_id#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_subject">
+			<![CDATA[
+			BBS_REPLY_SUBJECT = #bbs_reply_subject#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_content">
+			<![CDATA[
+			BBS_REPLY_CONTENT = #bbs_reply_content#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_prod_id">
+			<![CDATA[
+			BBS_PROD_ID = #bbs_prod_id#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_store_category">
+			<![CDATA[
+			BBS_STORE_CATEGORY = #bbs_store_category#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp1">
+			<![CDATA[
+			BBS_CP1 = #bbs_cp1#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp2">
+			<![CDATA[
+			BBS_CP2 = #bbs_cp2#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp3">
+			<![CDATA[
+			BBS_CP3 = #bbs_cp3#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp4">
+			<![CDATA[
+			BBS_CP4 = #bbs_cp4#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp5">
+			<![CDATA[
+			BBS_CP5 = #bbs_cp5#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp6">
+			<![CDATA[
+			BBS_CP6 = #bbs_cp6#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp7">
+			<![CDATA[
+			BBS_CP7 = #bbs_cp7#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp8">
+			<![CDATA[
+			BBS_CP8 = #bbs_cp8#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp9">
+			<![CDATA[
+			BBS_CP9 = #bbs_cp9#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp10">
+			<![CDATA[
+			BBS_CP10 = #bbs_cp10#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_star">
+			<![CDATA[
+			BBS_STAR = #bbs_star#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="modify_style">
+			<isEqual property="modify_style" compareValue="article">		
+			<![CDATA[
+				MOD_DT = now(),
+			]]>
+			</isEqual>
+			<isEqual property="modify_style" compareValue="reply_insert">		
+			<![CDATA[
+				REPLY_REG_DT =now(),
+			]]>
+			</isEqual>
+			<isEqual property="modify_style" compareValue="reply_modify">		
+			<![CDATA[
+				REPLY_MOD_DT = now(),
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+			BBS_FILE1 = #bbs_file1#,
+			BBS_FILE2 = #bbs_file2#,
+			BBS_LINK = #bbs_link#,
+			BBS_ST_DT = #bbs_st_dt#,
+			BBS_ED_DT = #bbs_ed_dt#,
+			BBS_USE_DATE = #bbs_use_date#
+		where
+			BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+	<!--  bbs 삭제 -->
+	<update id="delete_site_bbs" parameterClass="BaseBoardVO">
+		<![CDATA[
+		update base_bbs_tb set 
+			DEL_ST = #del_st#,
+			DEL_DT = now()
+		where
+			BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+</sqlMap>

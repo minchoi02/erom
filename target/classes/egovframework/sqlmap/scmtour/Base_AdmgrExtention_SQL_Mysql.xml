@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="afmgrExtention">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrExtentionVO" type="egovframework.admgrExtention.service.AdmgrExtentionVO"/>
+
+	<select id="get_coupon_list" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				base_coupon_tb.COUPON_SEQ,
+				base_coupon_tb.COUPON_ID,
+				base_coupon_tb.COUPON_NM,
+				base_coupon_tb.STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_coupon_tb.STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_coupon_tb.COUPON_SET_ST,
+				base_coupon_tb.COUPON_SET_PRICE,
+				substr(base_coupon_tb.COUPON_ST_DT,1,16) as COUPON_ST_DT, 
+				substr(base_coupon_tb.COUPON_ST_DT,1,10) as COUPON_ST_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ST_DT,12,2) as COUPON_ST_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ST_DT,15,2) as COUPON_ST_DT_MINUTE, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,16) as COUPON_ED_DT, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,10) as COUPON_ED_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ED_DT,12,2) as COUPON_ED_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ED_DT,15,2) as COUPON_ED_DT_MINUTE, 
+				base_coupon_tb.COUPON_USE_ST,
+				base_coupon_tb.REG_DT,
+				substr(base_coupon_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_coupon_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_coupon_tb.MOD_DT,
+				base_coupon_tb.DEL_DT,
+				CASE
+					WHEN (NOW() > base_coupon_tb.COUPON_ED_DT) THEN 'E'
+					WHEN (NOW() < base_coupon_tb.COUPON_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as COUPON_USE_STATUS
+			from base_coupon_tb
+			where 1
+				and base_coupon_tb.DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			base_coupon_tb.STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			base_coupon_tb.COUPON_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			order by base_coupon_tb.COUPON_ED_DT desc, base_coupon_tb.REG_DT desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#				
+		]]>
+	</select>
+	
+		<select id="get_coupon_list_cnt" parameterClass="AdmgrExtentionVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_coupon_tb
+			where 1
+				and DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			COUPON_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<select id="get_coupon_info" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				base_coupon_tb.COUPON_SEQ,
+				base_coupon_tb.COUPON_ID,
+				base_coupon_tb.COUPON_NM,
+				base_coupon_tb.STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_coupon_tb.STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_coupon_tb.COUPON_SET_ST,
+				base_coupon_tb.COUPON_SET_PRICE,
+				substr(base_coupon_tb.COUPON_ST_DT,1,16) as COUPON_ST_DT, 
+				substr(base_coupon_tb.COUPON_ST_DT,1,10) as COUPON_ST_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ST_DT,12,2) as COUPON_ST_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ST_DT,15,2) as COUPON_ST_DT_MINUTE, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,16) as COUPON_ED_DT, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,10) as COUPON_ED_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ED_DT,12,2) as COUPON_ED_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ED_DT,15,2) as COUPON_ED_DT_MINUTE, 
+				base_coupon_tb.COUPON_USE_ST,
+				base_coupon_tb.REG_DT,
+				substr(base_coupon_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_coupon_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_coupon_tb.MOD_DT,
+				base_coupon_tb.DEL_DT,
+				CASE
+					WHEN (NOW() > base_coupon_tb.COUPON_ED_DT) THEN 'E'
+					WHEN (NOW() < base_coupon_tb.COUPON_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as COUPON_USE_STATUS
+			from base_coupon_tb
+			where 
+				base_coupon_tb.COUPON_SEQ = #coupon_seq# 
+		]]>
+	</select>
+
+	<select id="get_coupon_id_info" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				base_coupon_tb.COUPON_SEQ,
+				base_coupon_tb.COUPON_ID,
+				base_coupon_tb.COUPON_NM,
+				base_coupon_tb.STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_coupon_tb.STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_coupon_tb.COUPON_SET_ST,
+				base_coupon_tb.COUPON_SET_PRICE,
+				substr(base_coupon_tb.COUPON_ST_DT,1,16) as COUPON_ST_DT, 
+				substr(base_coupon_tb.COUPON_ST_DT,1,10) as COUPON_ST_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ST_DT,12,2) as COUPON_ST_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ST_DT,15,2) as COUPON_ST_DT_MINUTE, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,16) as COUPON_ED_DT, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,10) as COUPON_ED_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ED_DT,12,2) as COUPON_ED_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ED_DT,15,2) as COUPON_ED_DT_MINUTE, 
+				base_coupon_tb.COUPON_USE_ST,
+				base_coupon_tb.REG_DT,
+				substr(base_coupon_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_coupon_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_coupon_tb.MOD_DT,
+				base_coupon_tb.DEL_DT,
+				CASE
+					WHEN (NOW() > base_coupon_tb.COUPON_ED_DT) THEN 'E'
+					WHEN (NOW() < base_coupon_tb.COUPON_ST_DT) THEN 'R'
+			        ELSE 'I'
+				END as COUPON_USE_STATUS
+			from base_coupon_tb
+			where 
+				base_coupon_tb.COUPON_ID = #coupon_id# 
+		]]>
+	</select>
+	
+	<insert id="insert_coupon" parameterClass="AdmgrExtentionVO" >
+		<![CDATA[
+			insert into base_coupon_tb
+				(
+					COUPON_ID, COUPON_NM, STORE_CATEGORY, COUPON_SET_ST, COUPON_SET_PRICE, 
+					COUPON_ST_DT, COUPON_ED_DT,
+					COUPON_USE_ST, REG_DT, MOD_DT, DEL_ST
+				) values (
+					#coupon_id#, #coupon_nm#, #store_category#, #coupon_set_st#, #coupon_set_price#, 
+					#coupon_st_dt#, #coupon_ed_dt#,
+					#coupon_use_st#, now(), now(), #del_st#
+				)			
+		]]>
+	</insert>
+	
+	<update id="update_coupon" parameterClass="AdmgrExtentionVO" >
+		<![CDATA[
+			update base_coupon_tb set
+				COUPON_NM = #coupon_nm#, 
+				STORE_CATEGORY = #store_category#, 
+				COUPON_SET_ST = #coupon_set_st#,
+				COUPON_SET_PRICE = #coupon_set_price#,
+				COUPON_ST_DT = #coupon_st_dt#,
+				COUPON_ED_DT = #coupon_ed_dt#,
+				COUPON_USE_ST = #coupon_use_st#,
+				MOD_DT = now()
+			where
+				COUPON_SEQ = #coupon_seq#
+		]]>
+	</update>
+	
+	<update id="delete_coupon" parameterClass="AdmgrExtentionVO" >
+		<![CDATA[
+			update base_coupon_tb set
+				DEL_ST = 'Y', 
+				DEL_DT = now()
+			where
+				COUPON_SEQ = #coupon_seq#
+		]]>
+	</update>
+	
+	<!-- 모달 쿠폰 조회 -->
+	<select id="get_modal_coupon_list" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				base_coupon_tb.COUPON_SEQ,
+				base_coupon_tb.COUPON_ID,
+				base_coupon_tb.COUPON_NM,
+				base_coupon_tb.STORE_CATEGORY,
+				(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_coupon_tb.STORE_CATEGORY ) as STORE_CATEGORY_NM,
+				base_coupon_tb.COUPON_SET_ST,
+				base_coupon_tb.COUPON_SET_PRICE,
+				substr(base_coupon_tb.COUPON_ST_DT,1,16) as COUPON_ST_DT, 
+				substr(base_coupon_tb.COUPON_ST_DT,1,10) as COUPON_ST_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ST_DT,12,2) as COUPON_ST_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ST_DT,15,2) as COUPON_ST_DT_MINUTE, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,16) as COUPON_ED_DT, 
+				substr(base_coupon_tb.COUPON_ED_DT,1,10) as COUPON_ED_DT_YMD, 
+				substr(base_coupon_tb.COUPON_ED_DT,12,2) as COUPON_ED_DT_HOUR, 
+				substr(base_coupon_tb.COUPON_ED_DT,15,2) as COUPON_ED_DT_MINUTE, 
+				base_coupon_tb.COUPON_USE_ST,
+				substr(base_coupon_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_coupon_tb.REG_DT,12,8) as REG_DT_HIS
+			from base_coupon_tb
+			where 1
+				and COUPON_USE_ST = 'Y'
+				and base_coupon_tb.DEL_ST = 'N'
+				and coupon_ed_dt > now()
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			base_coupon_tb.COUPON_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+			order by base_coupon_tb.COUPON_ED_DT desc, base_coupon_tb.REG_DT desc
+		]]>
+	</select>
+
+	<!-- 모달 쿠폰 조회 -->
+	<select id="get_modal_coupon_list_cnt" parameterClass="AdmgrExtentionVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_coupon_tb
+			where 1
+				and COUPON_USE_ST = 'Y'
+				and base_coupon_tb.DEL_ST = 'N'
+				and coupon_ed_dt > now()
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			base_coupon_tb.COUPON_NM like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<select id="get_sms_list" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				TR_SENDDATE,
+				substr(TR_SENDDATE,1,10) as TR_SENDDATE_YMD, 
+				substr(TR_SENDDATE,12,9) as TR_SENDDATE_HIS, 
+				TR_PHONE,
+				TR_MSG,
+				SMS_TARGET,
+				SMS_TYPE
+			from sc_tran_tb
+			where 1
+				and TR_PHONE != ''
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+				(TR_MSG like CONCAT('',#searchKeyword#,'%') or REPLACE(TR_PHONE,'-','') like CONCAT('',#searchKeyword#,'%'))	
+		]]>
+		</isNotEmpty>
+		<![CDATA[				
+			order by TR_NUM desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#				
+		]]>
+	</select>
+	<select id="get_sms_list_cnt" parameterClass="AdmgrExtentionVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from sc_tran_tb
+			where 1
+				and TR_PHONE != ''
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+				(TR_MSG like CONCAT('',#searchKeyword#,'%') or REPLACE(TR_PHONE,'-','') like CONCAT('',#searchKeyword#,'%'))	
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<select id="get_sms_member_list" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				USER_ID,
+				USER_NM,
+				USER_HP,
+				USER_LEVEL
+			from base_member_tb
+			where 1
+				and USER_ST = 'Y'
+				and USER_HP != ''
+				AND ( SUBSTRING(USER_HP,1,3) = '010' OR SUBSTRING(USER_HP,1,3) = '011' OR SUBSTRING(USER_HP,1,3) = '017' )
+				and length(USER_HP) > 10
+				and USER_LEVEL = #user_level#
+			order by USER_NM, USER_ID asc
+		]]>
+	</select>
+	<select id="get_sms_member_list_cnt" parameterClass="AdmgrExtentionVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_member_tb
+			where 1
+				and USER_ST = 'Y'
+				and USER_HP != ''
+				AND ( SUBSTRING(USER_HP,1,3) = '010' OR SUBSTRING(USER_HP,1,3) = '011' OR SUBSTRING(USER_HP,1,3) = '017' )
+				and length(USER_HP) > 10
+				and USER_LEVEL = #user_level#
+		]]>
+	</select>
+	<select id="get_sms_store_list" parameterClass="AdmgrExtentionVO" resultClass="AdmgrExtentionVO">
+		<![CDATA[
+			select 
+				mb.USER_ID,
+				mb.USER_NM,
+				mb.USER_HP,
+				mb.USER_LEVEL,
+				st.STORE_NM
+			from base_member_tb mb, base_store_tb st
+			where 1
+				and mb.USER_ID = st.USER_ID
+				and mb.USER_ST = 'Y'
+				and mb.USER_HP != ''
+				and ( substring(mb.USER_HP,1,3) = '010' or substring(mb.USER_HP,1,3) = '011' or substring(mb.USER_HP,1,3) = '017' )
+				and length(mb.USER_HP) > 10
+				and st.STORE_USE_ST = 'Y'
+				and mb.USER_LEVEL = #user_level#
+			order by STORE_NM asc
+		]]>
+	</select>
+	<select id="get_sms_store_list_cnt" parameterClass="AdmgrExtentionVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_member_tb mb, base_store_tb st
+			where 1
+				and mb.USER_ID = st.USER_ID
+				and mb.USER_ST = 'Y'
+				and mb.USER_HP != ''
+				and ( substring(mb.USER_HP,1,3) = '010' or substring(mb.USER_HP,1,3) = '011' or substring(mb.USER_HP,1,3) = '017' )
+				and length(mb.USER_HP) > 10
+				and st.STORE_USE_ST = 'Y'
+				and mb.USER_LEVEL = #user_level#
+		]]>
+	</select>
+	
+	<insert id="sms_add" parameterClass="AdmgrExtentionVO">
+		<![CDATA[
+			insert into sc_tran
+			(TR_SENDDATE, TR_PHONE, TR_CALLBACK, TR_MSG)
+			values
+			(
+			now(), 
+			#tr_phone#, 
+			#tr_callback#, 
+			#tr_msg#
+			)
+		]]>
+	</insert>
+	<insert id="sms_add_log" parameterClass="AdmgrExtentionVO">
+		<![CDATA[
+			insert into sc_tran_tb
+			(TR_SENDDATE, TR_PHONE, TR_CALLBACK, TR_MSG, SMS_TARGET, SMS_TYPE)
+			values
+			(
+			now(), 
+			#tr_phone#, 
+			#tr_callback#, 
+			#tr_msg#,
+			#sms_target#,
+			#sms_type#
+			)
+		]]>
+	</insert>
+	
+</sqlMap>

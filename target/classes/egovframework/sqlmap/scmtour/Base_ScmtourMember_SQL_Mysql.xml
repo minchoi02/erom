@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseMember">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseMemberVO" type="egovframework.base.member.service.BaseMemberVO"/>
+	
+	<insert id="insert_login_member" parameterClass="BaseMemberVO" >
+		<![CDATA[
+			insert into base_log_login_tb ( USER_ID , REG_DT ) values (  #user_id# , now() )
+		]]>
+	</insert>
+	
+	<!--  일반 회원로그인  -->
+	<select id="normal_login_check" parameterClass="BaseMemberVO" resultClass="BaseMemberVO" >
+		<![CDATA[
+			select 
+				USER_SEQ, 
+				USER_JOIN_FL, 
+				USER_ID,
+				USER_NM, 
+				USER_LEVEL, 
+				USER_HP, 
+				USER_EMAIL
+			from base_member_tb 
+			where 1
+				and USER_JOIN_FL = 'normal' 
+				and USER_ST = 'Y'
+				and USER_ID = #user_id#
+				and USER_PWD = #user_pwd#
+		]]>
+	</select>
+	
+	<select id="get_site_user_info" parameterClass="BaseMemberVO" resultClass="BaseMemberVO" >
+		<![CDATA[
+			select 
+				USER_SEQ, 
+				USER_JOIN_FL, 
+				USER_ID, 
+				USER_PWD, 
+				USER_NM, 
+				USER_LEVEL, 
+				USER_SEX_FL, 
+				USER_TEL, 
+				USER_HP, 
+				USER_EMAIL, 
+				USER_ST, 
+				USER_TOTAL_MILEAGE, 
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT, 
+				substr(WITHDRAW_DT,1,19) as WITHDRAW_DT,  
+				substr(DENY_DT,1,19) as DENY_DT, 
+				substr(LAST_LOGIN_DT,1,19) as LAST_LOGIN_DT, 
+				NEXT_CHANGE_PWD_DT, 
+				DEVICE_TOKEN,
+				USER_ADMIN_MEMO
+			from base_member_tb 
+			where 1
+				and USER_ST = 'Y'
+				and USER_ID = #user_id#
+		]]>
+	</select>
+	
+	<insert id="site_insert_member" parameterClass="BaseMemberVO" >
+		<![CDATA[
+			insert into base_member_tb 
+				(USER_JOIN_FL, USER_ID, USER_PWD, USER_NM, USER_LEVEL, USER_SEX_FL, USER_HP, USER_EMAIL, USER_BIRTH, USER_M_NM, USER_M_NUM, USER_ST, USER_TOTAL_MILEAGE, REG_DT, MOD_DT, USER_ADMIN_MEMO)
+			values
+				(#user_join_fl#, #user_id#, #user_pwd#, #user_nm#, #user_level#, #user_sex_fl#, #user_hp#, #user_email#, #user_birth#, #user_m_nm#, #user_m_num#, #user_st#, 0, now(), now(), #user_admin_memo# );
+		]]>
+	</insert>
+	
+	<update id="set_member_update" parameterClass="BaseMemberVO" >
+		<![CDATA[
+			update base_member_tb set 
+				USER_NM = #user_nm#,
+		]]>
+		<isNotEmpty property="user_pwd">		
+		<![CDATA[
+				USER_PWD = #user_pwd#,
+				USER_PASSWORD_TEMP = 'N',
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+				USER_HP = #user_hp#,
+				USER_EMAIL = #user_email#
+			where USER_ID = #user_id#
+		]]>
+	</update>
+	
+	<update id="set_member_out" parameterClass="BaseMemberVO" >
+		<![CDATA[
+			update base_member_tb set 
+				DENY_ST = 'Y',
+				WITHDRAW_DT = now(),
+				WITHDRAW_REASON = #withdraw_reason#
+				WITHDRAW_REASON_TEXT = #withdraw_reason_text#
+			where USER_ID = #user_id#
+		]]>
+	</update>
+	
+	<select id="is_member_id" parameterClass="BaseMemberVO" resultClass="int">
+		<![CDATA[
+			select
+				count(*)
+			from base_member_tb 
+			where 1
+				and USER_ID = #user_id#
+		]]>
+		<isNotEmpty property="user_join_fl"  prepend="AND">
+		<![CDATA[
+				USER_JOIN_FL = #user_join_fl#
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<select id="get_order_addr_list" parameterClass="BaseMemberVO" resultClass="BaseMemberVO">
+		<![CDATA[
+			select
+				ADDR_SEQ,
+				USER_ID,
+				ADDR_DEFAULT,
+				ADDR_NM,
+				ADDR_HP,
+				ADDR_EMAIL,
+				ADDR_ZIP,
+				ADDR_1,
+				ADDR_2,
+				DEL_ST,
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(MOD_DT,1,19) as MOD_DT
+			from base_addr_tb 
+			where 1 
+				and DEL_ST = 'N' 
+				and USER_ID = #user_id# 
+			order by ADDR_SEQ desc
+		]]>
+	</select>
+	
+	<select id="get_addr_info" parameterClass="BaseMemberVO" resultClass="BaseMemberVO">
+		<![CDATA[
+			select
+				ADDR_SEQ,
+				USER_ID,
+				ADDR_DEFAULT,
+				ADDR_NM,
+				ADDR_HP,
+				ADDR_EMAIL,
+				ADDR_ZIP,
+				ADDR_1,
+				ADDR_2,
+				DEL_ST,
+				REG_DT,
+				MOD_DT
+			from base_addr_tb
+			where 1
+				and DEL_ST = 'N' 
+				and USER_ID = #user_id#
+				and ADDR_SEQ = #addr_seq#
+		]]>
+	</select>
+	
+	<insert id="set_addr_insert" parameterClass="BaseMemberVO">
+		<![CDATA[
+			insert into base_addr_tb
+			(
+				USER_ID,
+				ADDR_DEFAULT,
+				ADDR_NM,
+				ADDR_HP,
+				ADDR_EMAIL,
+				ADDR_ZIP,
+				ADDR_1,
+				ADDR_2,
+				DEL_ST,
+				REG_DT
+			) values (
+				#user_id#,
+				#addr_default#,
+				#addr_nm#,
+				#addr_hp#,
+				#addr_email#,
+				#addr_zip#,
+				#addr_1#,
+				#addr_2#,
+				'N',
+				now()
+			)
+		]]>
+	</insert>
+	
+	<update id="set_addr_update" parameterClass="BaseMemberVO" >
+		<![CDATA[
+			update base_addr_tb set
+				ADDR_DEFAULT = #addr_default#,
+				ADDR_NM = #addr_nm#,
+				ADDR_HP = #addr_hp#,
+				ADDR_EMAIL = #addr_email#,
+				ADDR_ZIP = #addr_zip#,
+				ADDR_1 = #addr_1#,
+				ADDR_2 = #addr_2#,
+				MOD_DT = now()
+			where 1
+				and USER_ID = #user_id#
+				and ADDR_SEQ = #addr_seq#
+		]]>
+	</update>
+	
+	<update id="set_addr_delete" parameterClass="BaseMemberVO">
+		<![CDATA[
+			update base_addr_tb set
+				DEL_ST = 'Y' 
+			where 1
+				and USER_ID = #user_id#
+				and ADDR_SEQ = #addr_seq#
+		]]>
+	</update>
+	
+	<select id="find_user_id" parameterClass="BaseMemberVO" resultClass="BaseMemberVO">
+		<![CDATA[
+			select 
+				USER_ID,
+				USER_ST 
+			from base_member_tb  
+			where 1
+				and USER_NM = #user_nm#
+				and REPLACE(USER_HP,'-','') = REPLACE(#user_hp#, '-','')
+		]]>
+	</select>
+	<select id="find_user_hp" parameterClass="BaseMemberVO" resultClass="BaseMemberVO">
+		<![CDATA[
+			select 
+				USER_HP,
+				USER_ST 
+			from base_member_tb  
+			where 1
+				and USER_ID = #user_id#
+				and USER_NM = #user_nm#
+				and REPLACE(USER_HP,'-','') = REPLACE(#user_hp#, '-', '')
+		]]>
+	</select>
+	<update id="passwd_update" parameterClass="BaseMemberVO">
+		<![CDATA[
+			update base_member_tb set
+				USER_PWD = #user_pwd#
+				, USER_PASSWD_TEMP = 'Y' 
+			where 1
+				and USER_ID = #user_id#
+		]]>
+	</update>
+	
+</sqlMap>

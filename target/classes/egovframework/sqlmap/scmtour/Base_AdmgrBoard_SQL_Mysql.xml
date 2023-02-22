@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="admgrBoard">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrCustomerVO" type="egovframework.admgrCustomer.service.AdmgrCustomerVO"/>
+
+	<!-- 조회수 증가 -->
+	<update id="get_bbs_increase_hit" parameterClass="AdmgrCustomerVO">
+		<![CDATA[
+		UPDATE base_bbs_tb
+		SET BBS_HIT_CNT
+		=
+		IFNULL(BBS_HIT_CNT,0)+1	
+		where  
+		BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+
+	<!-- notice 글목록 -->
+	<select id="get_bbs_notice_list" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		select 
+			base_bbs_tb.BBS_SEQ,
+			base_bbs_tb.BBS_ID,
+			base_bbs_tb.USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+			base_bbs_tb.BBS_WRITER_NM,
+			base_bbs_tb.BBS_WRITER_PWD,
+			base_bbs_tb.BBS_WRITER_EMAIL,
+			base_bbs_tb.BBS_WRITER_HP,
+			base_bbs_tb.BBS_CATEGORY,
+			base_bbs_tb.BBS_NOTICE_ST,
+			base_bbs_tb.BBS_SECURE_ST,
+			base_bbs_tb.BBS_SUBJECT,
+			base_bbs_tb.BBS_CONTENT,
+			base_bbs_tb.BBS_REPLY_USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+			base_bbs_tb.BBS_REPLY_SUBJECT,
+			base_bbs_tb.BBS_REPLY_CONTENT,
+			base_bbs_tb.BBS_HIT_CNT,
+			base_bbs_tb.BBS_FILE1,
+			base_bbs_tb.BBS_FILE2,
+			base_bbs_tb.BBS_LINK,
+			substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+			substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+			base_bbs_tb.DEL_ST,
+			substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+			substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+			substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+			base_bbs_tb.REPLY_DEL_ST,
+			(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+			base_bbs_tb.BBS_STORE_ID,
+			(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+			(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+			base_bbs_tb.BBS_PROD_ID,
+			(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+			base_bbs_tb.BBS_STORE_CATEGORY,
+			(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+			base_bbs_tb.BBS_CP1,
+			base_bbs_tb.BBS_CP2,
+			base_bbs_tb.BBS_CP3,
+			base_bbs_tb.BBS_CP4,
+			base_bbs_tb.BBS_CP5,
+			base_bbs_tb.BBS_CP6,
+			base_bbs_tb.BBS_CP7,
+			base_bbs_tb.BBS_CP8,
+			base_bbs_tb.BBS_CP9,
+			base_bbs_tb.BBS_CP10,
+			base_bbs_tb.BBS_STAR
+		from base_bbs_tb
+		where 1 
+		and base_bbs_tb.DEL_ST = 'N'
+		and base_bbs_tb.BBS_ID = #bbs_id#
+		and base_bbs_tb.BBS_NOTICE_ST = 'Y'
+		]]>
+		<isNotEmpty property="user_level">
+			<isEqual prepend="AND" property="user_level" compareValue="5">
+			<![CDATA[
+				base_bbs_tb.BBS_STORE_ID in $bbs_store_id$
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+		order by base_bbs_tb.REG_DT desc
+		]]>
+	</select>
+	
+	
+	
+	<!-- 글목록 -->
+	<select id="get_bbs_list" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		select 
+			base_bbs_tb.BBS_SEQ,
+			base_bbs_tb.BBS_ID,
+			base_bbs_tb.USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+			base_bbs_tb.BBS_WRITER_NM,
+			base_bbs_tb.BBS_WRITER_PWD,
+			base_bbs_tb.BBS_WRITER_EMAIL,
+			base_bbs_tb.BBS_WRITER_HP,
+			base_bbs_tb.BBS_CATEGORY,
+			base_bbs_tb.BBS_NOTICE_ST,
+			base_bbs_tb.BBS_SECURE_ST,
+			base_bbs_tb.BBS_SUBJECT,
+			base_bbs_tb.BBS_CONTENT,
+			base_bbs_tb.BBS_REPLY_USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+			base_bbs_tb.BBS_REPLY_SUBJECT,
+			base_bbs_tb.BBS_REPLY_CONTENT,
+			base_bbs_tb.BBS_HIT_CNT,
+			base_bbs_tb.BBS_FILE1,
+			base_bbs_tb.BBS_FILE2,
+			base_bbs_tb.BBS_LINK,
+			substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+			substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+			base_bbs_tb.DEL_ST,
+			substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+			substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+			substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+			base_bbs_tb.REPLY_DEL_ST,
+			(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+			base_bbs_tb.BBS_STORE_ID,
+			(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+			(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+			base_bbs_tb.BBS_PROD_ID,
+			(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+			base_bbs_tb.BBS_STORE_CATEGORY,
+			(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+			base_bbs_tb.BBS_CP1,
+			base_bbs_tb.BBS_CP2,
+			base_bbs_tb.BBS_CP3,
+			base_bbs_tb.BBS_CP4,
+			base_bbs_tb.BBS_CP5,
+			base_bbs_tb.BBS_CP6,
+			base_bbs_tb.BBS_CP7,
+			base_bbs_tb.BBS_CP8,
+			base_bbs_tb.BBS_CP9,
+			base_bbs_tb.BBS_CP10,
+			substr(BBS_ST_DT,1,16) as BBS_ST_DT, 
+			substr(BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+			substr(BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+			substr(BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+			substr(BBS_ED_DT,1,16) as BBS_ED_DT, 
+			substr(BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+			substr(BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+			substr(BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+			BBS_USE_DATE,
+			base_bbs_tb.BBS_STAR	,
+			CASE
+				WHEN (NOW() > BBS_ED_DT) THEN 'E'
+				WHEN (NOW() < BBS_ST_DT) THEN 'R'
+		        ELSE 'I'
+			END as BBS_DATE_STATUS		
+		from base_bbs_tb
+		where 1 
+		and base_bbs_tb.DEL_ST = 'N'
+		and base_bbs_tb.BBS_ID = #bbs_id#
+		and base_bbs_tb.BBS_NOTICE_ST = 'N'
+		]]>
+		<isNotEmpty prepend="AND" property="store_category">
+			<![CDATA[
+				base_bbs_tb.BBS_STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="subejct">
+			<![CDATA[
+				base_bbs_tb.BBS_SUBJECT like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="content">
+			<![CDATA[
+				base_bbs_tb.BBS_CONTENT like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="subcontent">
+			<![CDATA[
+				(base_bbs_tb.BBS_SUBJECT like CONCAT('%',#searchKeyword#,'%') or base_bbs_tb.BBS_CONTENT like CONCAT('%',#searchKeyword#,'%'))
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="user_level">
+			<isEqual prepend="AND" property="user_level" compareValue="5">
+			<![CDATA[
+				base_bbs_tb.BBS_STORE_ID in $bbs_store_id$
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+		order by base_bbs_tb.REG_DT desc
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#		
+		]]>
+	</select>
+	
+	<!-- 글목록 갯수 -->
+	<select id="get_bbs_list_cnt" parameterClass="AdmgrCustomerVO" resultClass="int">
+		<![CDATA[
+		select 
+			count(*)
+		from base_bbs_tb
+		where 1 
+		and DEL_ST = 'N'
+		and BBS_ID = #bbs_id#
+		and BBS_NOTICE_ST = 'N'
+		]]>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="subejct">
+			<![CDATA[
+				BBS_SUBJECT like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="content">
+			<![CDATA[
+				BBS_CONTENT like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="subcontent">
+			<![CDATA[
+				(BBS_SUBJECT like CONCAT('%',#searchKeyword#,'%') or BBS_CONTENT like CONCAT('%',#searchKeyword#,'%'))
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="user_level">
+			<isEqual prepend="AND" property="user_level" compareValue="5">
+			<![CDATA[
+				BBS_STORE_ID in $bbs_store_id$
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 글목록 -->
+	<select id="get_bbs_info" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		select 
+			base_bbs_tb.BBS_SEQ,
+			(SELECT MAX(BBS_SEQ) 
+			  	  		FROM base_bbs_tb
+			  	  	  WHERE BBS_ID = #bbs_id#
+			  	  	  	  
+			  	  	  	  AND BBS_SEQ < #bbs_seq#  
+			  	  	  	  AND DEL_ST = 'N'
+			  	  	  	  AND BBS_NOTICE_ST = 'N'
+			  	  	  	  AND BBS_SECURE_ST = 'N'
+			  	  	  	  
+			  	  	 ) as PRE_SEQ,
+			(SELECT MIN(BBS_SEQ) 
+			  	  		FROM base_bbs_tb
+			  	  	  WHERE BBS_ID = #bbs_id#
+			  	  	  	  
+			  	  	  	  AND BBS_SEQ > #bbs_seq# 
+			  	  	  	  AND DEL_ST = 'N'
+			  	  	  	  AND BBS_NOTICE_ST = 'N'
+			  	  	  	  AND BBS_SECURE_ST = 'N'
+			  	  	 ) as NEXT_SEQ,			
+			base_bbs_tb.BBS_ID,
+			base_bbs_tb.USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+			base_bbs_tb.BBS_WRITER_NM,
+			base_bbs_tb.BBS_WRITER_PWD,
+			base_bbs_tb.BBS_WRITER_EMAIL,
+			base_bbs_tb.BBS_WRITER_HP,
+			base_bbs_tb.BBS_CATEGORY,
+			base_bbs_tb.BBS_NOTICE_ST,
+			base_bbs_tb.BBS_SECURE_ST,
+			base_bbs_tb.BBS_SUBJECT,
+			base_bbs_tb.BBS_CONTENT,
+			base_bbs_tb.BBS_REPLY_USER_ID,
+			(select base_member_tb.USER_NM from base_member_tb where base_bbs_tb.BBS_REPLY_USER_ID = base_member_tb.USER_ID) as BBS_REPLY_USER_NM,
+			base_bbs_tb.BBS_REPLY_SUBJECT,
+			base_bbs_tb.BBS_REPLY_CONTENT,
+			base_bbs_tb.BBS_HIT_CNT,
+			base_bbs_tb.BBS_FILE1,
+			base_bbs_tb.BBS_FILE2,
+			base_bbs_tb.BBS_LINK,
+			substr(base_bbs_tb.REG_DT,1,19) as REG_DT, 
+			substr(base_bbs_tb.REG_DT,1,10) as REG_DT_YMD, 
+			substr(base_bbs_tb.REG_DT,11,19) as REG_DT_HIS, 
+			substr(base_bbs_tb.MOD_DT,1,19) as MOD_DT, 
+			base_bbs_tb.DEL_ST,
+			substr(base_bbs_tb.DEL_DT,1,19) as DEL_DT,
+			substr(base_bbs_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+			substr(base_bbs_tb.REPLY_MOD_DT,1,19) as REPLY_MOD_DT, 
+			base_bbs_tb.REPLY_DEL_ST,
+			(select count(*) from base_bbs_comment_tb where base_bbs_comment_tb.BBS_SEQ = base_bbs_tb.BBS_SEQ and base_bbs_comment_tb.DEL_ST = 'N' ) as COMM_CNT,
+			base_bbs_tb.BBS_STORE_ID,
+			(select base_store_tb.STORE_NM from base_store_tb where base_store_tb.STORE_ID = base_bbs_tb.BBS_STORE_ID ) as STORE_NM,
+			(select base_product_tb.PROD_IMG_1 from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_IMG_1,
+			base_bbs_tb.BBS_PROD_ID,
+			(select base_product_tb.PROD_NM from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_NM,
+			(select base_product_tb.PROD_STAR from base_product_tb where base_product_tb.PROD_ID = base_bbs_tb.BBS_PROD_ID ) as PROD_STAR,
+			base_bbs_tb.BBS_STORE_CATEGORY,
+			(select base_code_cd_tb.BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_bbs_tb.BBS_STORE_CATEGORY ) as STORE_CATEGORY_NM,
+			base_bbs_tb.BBS_CP1,
+			base_bbs_tb.BBS_CP2,
+			base_bbs_tb.BBS_CP3,
+			base_bbs_tb.BBS_CP4,
+			base_bbs_tb.BBS_CP5,
+			base_bbs_tb.BBS_CP6,
+			base_bbs_tb.BBS_CP7,
+			base_bbs_tb.BBS_CP8,
+			base_bbs_tb.BBS_CP9,
+			base_bbs_tb.BBS_CP10,
+			substr(BBS_ST_DT,1,16) as BBS_ST_DT, 
+			substr(BBS_ST_DT,1,10) as BBS_ST_DT_YMD, 
+			substr(BBS_ST_DT,12,2) as BBS_ST_DT_HOUR, 
+			substr(BBS_ST_DT,15,2) as BBS_ST_DT_MINUTE, 
+			substr(BBS_ED_DT,1,16) as BBS_ED_DT, 
+			substr(BBS_ED_DT,1,10) as BBS_ED_DT_YMD, 
+			substr(BBS_ED_DT,12,2) as BBS_ED_DT_HOUR, 
+			substr(BBS_ED_DT,15,2) as BBS_ED_DT_MINUTE, 
+			BBS_USE_DATE,
+			base_bbs_tb.BBS_STAR	,
+			CASE
+				WHEN (NOW() > BBS_ED_DT) THEN 'E'
+				WHEN (NOW() < BBS_ST_DT) THEN 'R'
+		        ELSE 'I'
+			END as BBS_DATE_STATUS	
+		from base_bbs_tb
+		where 1 
+		and base_bbs_tb.DEL_ST = 'N'
+		and base_bbs_tb.BBS_ID = #bbs_id#
+		and base_bbs_tb.BBS_SEQ = #bbs_seq#
+		]]>
+		<isNotEmpty property="user_level">
+			<isEqual prepend="AND" property="user_level" compareValue="5">
+			<![CDATA[
+				base_bbs_tb.BBS_STORE_ID in $bbs_store_id$
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+
+<select id="get_bbs_info2" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		SELECT 
+
+(SELECT MAX(BBS_SEQ) 
+			  	  		FROM base_bbs_tb
+			  	  	  WHERE BBS_ID = #bbs_id#
+			  	  	  	  AND BBS_SEQ < #bbs_seq#  
+			  	  	  	  AND DEL_ST = 'N'
+			  	  	  	  AND BBS_NOTICE_ST = 'N'
+			  	  	  	  AND BBS_SECURE_ST = 'N'
+			  	  	 ) as PRE_SEQ2,
+(SELECT MIN(BBS_SEQ) 
+			  	  		FROM base_bbs_tb
+			  	  	  WHERE BBS_ID = #bbs_id#
+			  	  	  	  AND BBS_SEQ > #bbs_seq#  
+			  	  	  	  AND DEL_ST = 'N'
+			  	  	  	  AND BBS_NOTICE_ST = 'N'
+			  	  	  	  AND BBS_SECURE_ST = 'N'
+			  	  	 ) as NEXT_SEQ2	
+		from base_bbs_tb
+		where 1 
+		and base_bbs_tb.DEL_ST = 'N'
+		and base_bbs_tb.BBS_ID = #bbs_id#
+		and base_bbs_tb.BBS_SEQ = #bbs_seq#
+		]]>
+	</select>
+		
+
+		
+	<!-- 댓글목록 -->
+	<select id="get_bbs_comment_list" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		select 
+			base_bbs_comment_tb.COMM_SEQ,
+			base_bbs_comment_tb.BBS_ID,
+			base_bbs_comment_tb.BBS_SEQ,
+			base_bbs_comment_tb.COMM_PSEQ,
+			base_bbs_comment_tb.COMM_STEP,
+			base_bbs_comment_tb.USER_ID,
+			(select base_bbs_comment_tb.USER_NM from base_bbs_comment_tb where base_bbs_comment_tb.USER_ID = base_member_tb.USER_ID) as USER_NM,
+			base_bbs_comment_tb.COMM_SUBJECT,
+			base_bbs_comment_tb.COMM_CONTENT,
+			base_bbs_comment_tb.COMM_REPLY_USER_ID,
+			(select base_bbs_comment_tb.USER_NM from base_bbs_comment_tb where base_bbs_comment_tb.USER_ID = base_member_tb.COMM_REPLY_USER_ID) as comm_reply_user_nm,
+			base_bbs_comment_tb.COMM_REPLY_SUBJECT,
+			base_bbs_comment_tb.COMM_REPLY_CONTENT,
+			substr(base_bbs_comment_tb.REG_DT,1,19) as REG_DT, 
+			substr(base_bbs_comment_tb.REPLY_REG_DT,1,19) as REPLY_REG_DT, 
+			substr(base_bbs_comment_tb.MOD_DT,1,19) as MOD_DT, 
+			base_bbs_comment_tb.DEL_ST,
+			substr(base_bbs_comment_tb.DEL_DT,1,19) as DEL_DT
+		from base_bbs_comment_tb
+		where 1
+		and base_bbs_comment_tb.BBS_SEQ = #bbs_seq#
+		and base_bbs_comment_tb.DEL_ST = 'N'
+		and 
+		order by base_bbs_comment_tb.COMM_PSEQ desc,  base_bbs_comment_tb.COMM_STEP asc
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#		
+		]]>
+	</select>
+	
+	<!-- 갯글 총 갯수 -->
+	<select id="get_bbs_comment_list_cnt" parameterClass="AdmgrCustomerVO" resultClass="int">
+		<![CDATA[
+		select 
+			count(*)
+		from base_bbs_comment_tb
+		where 1
+		and BBS_SEQ = #bbs_seq#
+		and DEL_ST = 'N'
+		]]>
+	</select>
+
+	<!--  bbs 등록 -->
+	<insert id="insert_bbs" parameterClass="AdmgrCustomerVO">
+		<![CDATA[
+		insert into base_bbs_tb
+			(
+			BBS_ID,USER_ID,
+			BBS_WRITER_NM,BBS_WRITER_PWD,BBS_WRITER_EMAIL,BBS_WRITER_HP,
+			BBS_CATEGORY,
+			BBS_NOTICE_ST,BBS_SECURE_ST,
+			BBS_SUBJECT,BBS_CONTENT,
+			BBS_REPLY_SUBJECT,BBS_REPLY_CONTENT,
+			BBS_HIT_CNT,BBS_FILE1,BBS_FILE2,BBS_LINK,
+			REG_DT,MOD_DT,DEL_ST,
+			BBS_STORE_ID, BBS_PROD_ID, BBS_STORE_CATEGORY,
+			REPLY_REG_DT,REPLY_MOD_DT,REPLY_DEL_ST,
+			BBS_CP1, BBS_CP2, BBS_CP3, BBS_CP4, BBS_CP5, BBS_CP6, BBS_CP7, BBS_CP8, BBS_CP9, BBS_CP10,
+			BBS_ST_DT, BBS_ED_DT, BBS_USE_DATE, BBS_STAR
+			)
+		values
+			(
+			#bbs_id#,#user_id#,
+			#bbs_writer_nm#,#bbs_writer_pwd#,#bbs_writer_email#,#bbs_writer_hp#,
+			#bbs_category#,
+			#bbs_notice_st#,#bbs_secure_st#,
+			#bbs_subject#,#bbs_content#,
+			#bbs_reply_subject#,#bbs_reply_content#,
+			0,#bbs_file1#,#bbs_file2#,#bbs_link#,
+			now(),now(),#del_st#,
+			#bbs_store_id#, 	#bbs_prod_id#, 	#bbs_store_category#,
+			#reply_reg_dt#,#reply_mod_dt#,#reply_del_st#,
+			#bbs_cp1#,#bbs_cp2#,#bbs_cp3#,#bbs_cp4#,#bbs_cp5#,#bbs_cp6#,#bbs_cp7#,#bbs_cp8#,#bbs_cp9#,#bbs_cp10#,
+			#bbs_st_dt#, #bbs_ed_dt#, #bbs_use_date#, #bbs_star#
+			)
+		]]>
+	</insert>
+
+	<!--  bbs 수정 -->
+	<update id="update_bbs" parameterClass="AdmgrCustomerVO">
+		<![CDATA[
+		update base_bbs_tb set
+		]]>
+		<isNotEmpty property="bbs_writer_nm">
+			<![CDATA[
+			BBS_WRITER_NM = #bbs_writer_nm#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_pwd">
+			<![CDATA[
+			BBS_WRITER_PWD = #bbs_writer_pwd#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_email">
+			<![CDATA[
+			BBS_WRITER_EMAIL = #bbs_writer_email#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_writer_hp">
+			<![CDATA[
+			BBS_WRITER_HP = #bbs_writer_hp#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_category">
+			<![CDATA[
+			BBS_CATEGORY = #bbs_category#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_notice_st">
+			<![CDATA[
+			BBS_NOTICE_ST = #bbs_notice_st#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_secure_st">
+			<![CDATA[
+			BBS_SECURE_ST = #bbs_secure_st#,
+			]]>
+		</isNotEmpty>		
+		<isNotEmpty property="bbs_subject">
+			<![CDATA[
+			BBS_SUBJECT = #bbs_subject#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_content">
+			<![CDATA[
+			BBS_CONTENT = #bbs_content#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_user_id">
+			<![CDATA[
+			BBS_REPLY_USER_ID = #bbs_reply_user_id#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_subject">
+			<![CDATA[
+			BBS_REPLY_SUBJECT = #bbs_reply_subject#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_reply_content">
+			<![CDATA[
+			BBS_REPLY_CONTENT = #bbs_reply_content#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_prod_id">
+			<![CDATA[
+			BBS_PROD_ID = #bbs_prod_id#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_store_category">
+			<![CDATA[
+			BBS_STORE_CATEGORY = #bbs_store_category#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp1">
+			<![CDATA[
+			BBS_CP1 = #bbs_cp1#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp2">
+			<![CDATA[
+			BBS_CP2 = #bbs_cp2#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp3">
+			<![CDATA[
+			BBS_CP3 = #bbs_cp3#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp4">
+			<![CDATA[
+			BBS_CP4 = #bbs_cp4#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp5">
+			<![CDATA[
+			BBS_CP5 = #bbs_cp5#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp6">
+			<![CDATA[
+			BBS_CP6 = #bbs_cp6#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp7">
+			<![CDATA[
+			BBS_CP7 = #bbs_cp7#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp8">
+			<![CDATA[
+			BBS_CP8 = #bbs_cp8#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp9">
+			<![CDATA[
+			BBS_CP9 = #bbs_cp9#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_cp10">
+			<![CDATA[
+			BBS_CP10 = #bbs_cp10#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="bbs_star">
+			<![CDATA[
+			BBS_STAR = #bbs_star#,
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="modify_style">
+			<isEqual property="modify_style" compareValue="article">		
+			<![CDATA[
+				MOD_DT = now(),
+			]]>
+			</isEqual>
+			<isEqual property="modify_style" compareValue="reply_insert">		
+			<![CDATA[
+				REPLY_REG_DT =now(),
+			]]>
+			</isEqual>
+			<isEqual property="modify_style" compareValue="reply_modify">		
+			<![CDATA[
+				REPLY_MOD_DT = now(),
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+			BBS_FILE1 = #bbs_file1#,
+			BBS_FILE2 = #bbs_file2#,
+			BBS_LINK = #bbs_link#,
+			BBS_ST_DT = #bbs_st_dt#,
+			BBS_ED_DT = #bbs_ed_dt#,
+			BBS_USE_DATE = #bbs_use_date#
+		where
+			BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+	<!--  bbs 삭제 -->
+	<update id="delete_bbs" parameterClass="AdmgrCustomerVO">
+		<![CDATA[
+		update base_bbs_tb set 
+			DEL_ST = #del_st#,
+			DEL_DT = now()
+		where
+			BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+	<!--  bbs 삭제 -->
+	<update id="delete_bbs_reply" parameterClass="AdmgrCustomerVO">
+		<![CDATA[
+		update base_bbs_tb set 
+			REPLY_DEL_ST = #reply_del_st#
+		where
+			BBS_SEQ = #bbs_seq#
+		]]>
+	</update>
+	
+	<!-- 
+		<select id="get_board_list" parameterClass="AdmgrCustomerVO" resultClass="AdmgrCustomerVO">
+		<![CDATA[
+		select 
+			 
+		from base_config_default_tb
+		]]>
+		<selectKey type="post" keyProperty="insert_id" resultClass="int">
+			<![CDATA[
+			select LAST_INSERT_ID() as insert_id
+			]]>
+		</selectKey>
+	</select>
+	
+	 -->	
+</sqlMap>

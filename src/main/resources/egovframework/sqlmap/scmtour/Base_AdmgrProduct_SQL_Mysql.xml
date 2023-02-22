@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AdmgrProduct">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrProductVO" type="egovframework.admgrProduct.service.AdmgrProductVO"/>
+	
+	<!-- 상품목록 불러오기 -->
+	<select id="get_product_list" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			select 
+				PROD_SEQ,
+				PROD_USE_ST,
+				STORE_ID,
+				STORE_NM,
+				STORE_CATEGORY,
+				PROD_ID,
+				PROD_NM,
+				PROD_CATEGORY,
+				PROD_CATEGORY_CD,
+				(select BASE_CD_NM from base_code_cd_tb where BASE_CD = PROD_CATEGORY) as PROD_CATEGORY_NM,
+				PROD_COMMENT,
+				PROD_CONTENT,
+				PROD_CONTENT_2,
+				PROD_MARKET_PRICE,
+				PROD_PRICE,
+				PROD_PRICE_PERCENT,
+				PROD_MIN_PRICE,
+				PROD_ORDERBY,
+				PROD_STOCK_SET,
+				PROD_STOCK_CNT,
+				substr(PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE,
+				PROD_HIT_CNT,
+				PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = PROD_ID) as PROD_REVIEW_CNT,
+				PROD_USE_COUPON_ST,
+				PROD_USE_MILEAGE_ST,
+				PROD_USE_PAY_ST,
+				PROD_RESERVE_LIMIT,
+				PROD_BUNDLE_DELIVERY,
+				PROD_CONTENT_TIME,
+				PROD_CONTENT_PAY,
+				PROD_CONTENT_PRECAUTIONS,
+				PROD_CONTENT_COURSE,
+				PROD_IMG_1,
+				PROD_IMG_2,
+				PROD_IMG_3,
+				PROD_IMG_4,
+				PROD_IMG_5,
+				PROD_IMG_6,
+				PROD_IMG_7,
+				PROD_IMG_8,
+				PROD_IMG_9,
+				PROD_IMG_10,
+				PROD_MOVIE,
+				PROD_MAKER,
+				PROD_COUNTRY,
+				substr(REG_DT,1,10) as REG_DT,
+				substr(MOD_DT,1,10) as MOD_DT,
+				PROD_AGE,
+				PROD_SEASON,
+				PROD_TRAVEL_TYPE,
+				PROD_INFO_1,
+				PROD_INFO_2,
+				PROD_INFO_3,
+				PROD_INFO_4,
+				PROD_INFO_5,
+				PROD_INFO_6,
+				PROD_INFO_7,
+				PROD_INFO_8,
+				PROD_INFO_9,
+				PROD_INFO_10,
+				PROD_INFO_11,
+				PROD_INFO_12,
+				PROD_INFO_13,
+				PROD_INFO_14,
+				PROD_INFO_15,
+				PROD_TRADE_INFO_1,
+				PROD_TRADE_INFO_2,
+				PROD_TRADE_INFO_3,
+				PROD_TRADE_INFO_4,
+				PROD_TRADE_INFO_5,
+				PROD_RECOM_1,
+				PROD_RECOM_2,
+				PROD_RECOM_3,
+				PROD_RECOM_4,
+				PROD_RECOM_5,
+				PROD_RECOM_6,
+				PROD_RECOM_7,
+				PROD_RECOM_8,
+				PROD_RECOM_9,
+				PROD_RECOM_10,
+				(SELECT COUNT(*) FROM base_product_tb b
+					WHERE 1 AND 
+					b.PROD_ID != a.PROD_ID AND b.STORE_CATEGORY = 'CD002005'
+					AND 
+					( b.PROD_RECOM_1 = a.PROD_ID OR b.PROD_RECOM_2 = a.PROD_ID OR b.PROD_RECOM_3 = a.PROD_ID OR b.PROD_RECOM_4 = a.PROD_ID OR b.PROD_RECOM_5 = a.PROD_ID 
+					OR 
+					b.PROD_RECOM_6 = a.PROD_ID OR b.PROD_RECOM_7 = a.PROD_ID OR b.PROD_RECOM_8 = a.PROD_ID OR b.PROD_RECOM_9 = a.PROD_ID OR b.PROD_RECOM_10 = a.PROD_ID ) 
+				) as is_recom 
+			from base_product_tb a
+			where 1
+				and DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = a.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>	
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="prod_use_st"  prepend="AND">
+		<![CDATA[
+			PROD_USE_ST = #prod_use_st#
+		]]>
+		</isNotEmpty>	
+		<isNotEmpty property="searchKeyword" prepend="AND">
+		<![CDATA[
+			$search_sql$
+		]]>
+		</isNotEmpty>			 
+		<![CDATA[
+			order by PROD_ORDERBY desc, PROD_HIT_CNT desc, PROD_PICK_CNT desc, PROD_STAR desc, PROD_ORDER_CNT desc, REG_DT desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 상품목록 - 추천여행 불러오기 -->
+	<select id="get_product_list_recom_travel" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			select 
+				org.PROD_SEQ,
+				org.PROD_USE_ST,
+				org.STORE_ID,
+				org.STORE_NM,
+				org.STORE_CATEGORY,
+				org.PROD_ID,
+				org.PROD_NM,
+				org.PROD_CATEGORY,
+				org.PROD_CATEGORY_CD,
+				(select BASE_CD_NM from base_code_cd_tb where BASE_CD = org.PROD_CATEGORY) as PROD_CATEGORY_NM,
+				org.PROD_COMMENT,
+				org.PROD_CONTENT,
+				org.PROD_CONTENT_2,
+				org.PROD_MARKET_PRICE,
+				org.PROD_PRICE,
+				org.PROD_PRICE_PERCENT,
+				org.PROD_MIN_PRICE,
+				org.PROD_ORDERBY,
+				org.PROD_STOCK_SET,
+				org.PROD_STOCK_CNT,
+				substr(org.PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(org.PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(org.PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(org.PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(org.PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(org.PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(org.PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(org.PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE,
+				org.PROD_HIT_CNT,
+				org.PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = org.PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = org.PROD_ID) as PROD_REVIEW_CNT,
+				org.PROD_MOVIE,
+				org.PROD_MAKER,
+				org.PROD_COUNTRY,
+				substr(org.REG_DT,1,10) as REG_DT,
+				substr(org.MOD_DT,1,10) as MOD_DT,
+				org.PROD_AGE,
+				org.PROD_SEASON,
+				org.PROD_TRAVEL_TYPE,
+				org.PROD_RECOM_1,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_1) AS RECOM_1_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_1) AS RECOM_1_USE_ST,
+				org.PROD_RECOM_2,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_2) AS RECOM_2_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_2) AS RECOM_2_USE_ST,
+				org.PROD_RECOM_3,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_3) AS RECOM_3_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_3) AS RECOM_3_USE_ST,
+				org.PROD_RECOM_4,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_4) AS RECOM_4_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_4) AS RECOM_4_USE_ST,
+				org.PROD_RECOM_5,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_5) AS RECOM_5_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_5) AS RECOM_5_USE_ST,
+				org.PROD_RECOM_6,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_6) AS RECOM_6_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_6) AS RECOM_6_USE_ST,
+				org.PROD_RECOM_7,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_7) AS RECOM_7_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_7) AS RECOM_7_USE_ST,
+				org.PROD_RECOM_8,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_8) AS RECOM_8_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_8) AS RECOM_8_USE_ST,
+				org.PROD_RECOM_9,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_9) AS RECOM_9_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_9) AS RECOM_9_USE_ST,
+				org.PROD_RECOM_10,
+				(SELECT recom.PROD_NM FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_10) AS RECOM_10_PROD_NM,
+				(SELECT recom.PROD_USE_ST FROM base_product_tb recom WHERE recom.PROD_ID = org.PROD_RECOM_10) AS RECOM_10_USE_ST
+			from base_product_tb org
+			where 1
+				and org.DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			org.STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>	
+		<isNotEmpty property="prod_use_st"  prepend="AND">
+		<![CDATA[
+			org.PROD_USE_ST = #prod_use_st#
+		]]>
+		</isNotEmpty>	
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				org.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>			 
+		<![CDATA[
+			order by org.PROD_ORDERBY desc, org.PROD_HIT_CNT desc, org.PROD_PICK_CNT desc, org.PROD_STAR desc
+			LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+	
+	<!-- 상품목록 총 카운터 불러오기 -->
+	<select id="get_product_list_cnt" parameterClass="AdmgrProductVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_product_tb 
+			where 1 
+				and DEL_ST = 'N'
+		]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = base_product_tb.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="prod_use_st"  prepend="AND">
+		<![CDATA[
+			PROD_USE_ST = #prod_use_st#
+		]]>
+		</isNotEmpty>	
+		<isNotEmpty property="searchKeyword" prepend="AND">
+		<![CDATA[
+			$search_sql$
+		]]>	
+		</isNotEmpty>	 
+	</select>
+	
+	<!-- 상덤정보 수정 후, 상품의 상점명 업데이트 -->
+	<update id="update_store_nm" parameterClass="AdmgrProductVO">
+		<![CDATA[
+			update base_product_tb set STORE_NM = #store_nm# where store_id = #store_id#
+		]]>
+	</update>
+	
+	<!-- 상품정보 호출 -->
+	<select id="get_prod_info" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			select 
+				PROD_SEQ,
+				PROD_USE_ST,
+				STORE_ID,
+				STORE_NM,
+				STORE_CATEGORY,
+				PROD_ID,
+				PROD_NM,
+				PROD_CATEGORY,
+				PROD_CATEGORY_CD,
+				(select BASE_CD_NM from base_code_cd_tb where BASE_CD = PROD_CATEGORY) as PROD_CATEGORY_NM,
+				PROD_COMMENT,
+				PROD_CONTENT,
+				PROD_CONTENT_2,
+				PROD_MARKET_PRICE,
+				PROD_PRICE,
+				PROD_PRICE_PERCENT,
+				PROD_MIN_PRICE,
+				PROD_ORDERBY,
+				PROD_STOCK_SET,
+				PROD_STOCK_CNT,
+				substr(PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE,
+				PROD_HIT_CNT,
+				PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = PROD_ID) as PROD_REIVEW_CNT,
+				PROD_USE_COUPON_ST,
+				PROD_USE_MILEAGE_ST,
+				PROD_USE_PAY_ST,
+				PROD_RESERVE_LIMIT,
+				PROD_BUNDLE_DELIVERY,
+				PROD_CONTENT_TIME,
+				PROD_CONTENT_PAY,
+				PROD_CONTENT_PRECAUTIONS,
+				PROD_CONTENT_COURSE,
+				PROD_IMG_1,
+				PROD_IMG_2,
+				PROD_IMG_3,
+				PROD_IMG_4,
+				PROD_IMG_5,
+				PROD_IMG_6,
+				PROD_IMG_7,
+				PROD_IMG_8,
+				PROD_IMG_9,
+				PROD_IMG_10,
+				PROD_MOVIE,
+				PROD_MAKER,
+				PROD_COUNTRY,
+				substr(REG_DT,1,10) as REG_DT,
+				substr(MOD_DT,1,10) as MOD_DT,
+				PROD_AGE,
+				PROD_SEASON,
+				PROD_TRAVEL_TYPE,
+				PROD_INFO_1,
+				PROD_INFO_2,
+				PROD_INFO_3,
+				PROD_INFO_4,
+				PROD_INFO_5,
+				PROD_INFO_6,
+				PROD_INFO_7,
+				PROD_INFO_8,
+				PROD_INFO_9,
+				PROD_INFO_10,
+				PROD_INFO_11,
+				PROD_INFO_12,
+				PROD_INFO_13,
+				PROD_INFO_14,
+				PROD_INFO_15,
+				PROD_TRADE_INFO_1,
+				PROD_TRADE_INFO_2,
+				PROD_TRADE_INFO_3,
+				PROD_TRADE_INFO_4,
+				PROD_TRADE_INFO_5,
+				PROD_RECOM_1,
+				PROD_RECOM_2,
+				PROD_RECOM_3,
+				PROD_RECOM_4,
+				PROD_RECOM_5,
+				PROD_RECOM_6,
+				PROD_RECOM_7,
+				PROD_RECOM_8,
+				PROD_RECOM_9,
+				PROD_RECOM_10
+			from base_product_tb
+			where 1
+				and DEL_ST = 'N'
+				and PROD_SEQ = #prod_seq#
+		]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = base_product_tb.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>
+	</select>
+	<!-- 상품정보 호출 simpel -id -->
+	<select id="get_prod_simple_id_info" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			select 
+				PROD_SEQ,
+				PROD_USE_ST,
+				STORE_ID,
+				STORE_NM,
+				STORE_CATEGORY,
+				PROD_ID,
+				PROD_NM,
+				PROD_CATEGORY_CD,
+				PROD_COMMENT,
+				PROD_CONTENT,
+				PROD_CONTENT_2,
+				PROD_MARKET_PRICE,
+				PROD_PRICE,
+				PROD_PRICE_PERCENT,
+				PROD_MIN_PRICE,
+				PROD_STOCK_SET,
+				PROD_STOCK_CNT,
+				substr(PROD_ST_DT,1,16) as PROD_ST_DT, 
+				substr(PROD_ST_DT,1,10) as PROD_ST_DT_YMD, 
+				substr(PROD_ST_DT,12,2) as PROD_ST_DT_HOUR, 
+				substr(PROD_ST_DT,15,2) as PROD_ST_DT_MINUTE, 
+				substr(PROD_ED_DT,1,16) as PROD_ED_DT, 
+				substr(PROD_ED_DT,1,10) as PROD_ED_DT_YMD, 
+				substr(PROD_ED_DT,12,2) as PROD_ED_DT_HOUR, 
+				substr(PROD_ED_DT,15,2) as PROD_ED_DT_MINUTE, 
+				PROD_HIT_CNT,
+				PROD_PICK_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'QNA' and BBS_PROD_ID = PROD_ID) as PROD_QNA_CNT,
+				(select count(*) from base_bbs_tb where BBS_ID = 'REVIEW' and BBS_PROD_ID = PROD_ID) as PROD_REVIEW_CNT,
+				PROD_USE_COUPON_ST,
+				PROD_USE_MILEAGE_ST,
+				PROD_USE_PAY_ST,
+				PROD_RESERVE_LIMIT,
+				PROD_BUNDLE_DELIVERY,
+				PROD_AGE,
+				PROD_SEASON,
+				PROD_TRAVEL_TYPE,
+				PROD_IMG_1
+			from base_product_tb
+			where 1
+				and DEL_ST = 'N'
+				and PROD_ID = #prod_id#
+		]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = base_product_tb.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 상품정보 모달검색 -->
+	<select id="get_product_modal_list" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			SELECT 
+				base_product_tb.PROD_SEQ,
+				base_product_tb.PROD_USE_ST,
+				base_product_tb.STORE_ID,
+				base_product_tb.STORE_NM,
+				base_product_tb.STORE_CATEGORY,
+				(SELECT base_code_cd_tb.BASE_CD_NM FROM base_code_cd_tb WHERE base_code_cd_tb.BASE_CD =   base_product_tb.store_category) AS STORE_CATEGORY_NM,
+				base_product_tb.PROD_ID,
+				base_product_tb.PROD_NM,
+				base_product_tb.PROD_CATEGORY,
+				base_product_tb.PROD_CATEGORY_CD,
+				SUBSTR(base_product_tb.PROD_ST_DT,1,16) AS PROD_ST_DT, 
+				SUBSTR(base_product_tb.PROD_ST_DT,1,10) AS PROD_ST_DT_YMD, 
+				SUBSTR(base_product_tb.PROD_ST_DT,12,2) AS PROD_ST_DT_HOUR, 
+				SUBSTR(base_product_tb.PROD_ST_DT,15,2) AS PROD_ST_DT_MINUTE, 
+				SUBSTR(base_product_tb.PROD_ED_DT,1,16) AS PROD_ED_DT, 
+				SUBSTR(base_product_tb.PROD_ED_DT,1,10) AS PROD_ED_DT_YMD, 
+				SUBSTR(base_product_tb.PROD_ED_DT,12,2) AS PROD_ED_DT_HOUR, 
+				SUBSTR(base_product_tb.PROD_ED_DT,15,2) AS PROD_ED_DT_MINUTE,
+				base_product_tb.PROD_HIT_CNT,
+				base_product_tb.PROD_PICK_CNT,
+				base_product_tb.PROD_USE_COUPON_ST,
+				base_product_tb.PROD_USE_MILEAGE_ST,
+				base_product_tb.PROD_USE_PAY_ST,
+				base_product_tb.PROD_RESERVE_LIMIT,
+				base_product_tb.PROD_IMG_1,
+				base_product_tb.PROD_AGE,
+				base_product_tb.PROD_SEASON,
+				base_product_tb.PROD_TRAVEL_TYPE,
+				SUBSTR(base_product_tb.REG_DT,1,10) AS REG_DT,
+				base_store_tb.STORE_USE_ST
+			FROM base_product_tb , base_store_tb
+			WHERE 1
+				and base_product_tb.DEL_ST = 'N'
+				and base_store_tb.STORE_USE_ST = 'Y'				
+				and base_product_tb.STORE_ID = base_store_tb.STORE_ID
+		]]>
+		<isNotEmpty property="prod_use_pay_st"  prepend="AND">
+		<![CDATA[
+			base_product_tb.PROD_USE_PAY_ST = #prod_use_pay_st#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			base_product_tb.STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+
+	<!--모달검색 갯수  -->
+	<select id="get_product_modal_list_cnt" parameterClass="AdmgrProductVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*)
+			from base_product_tb , base_store_tb
+			where 1
+				and PROD_USE_ST != 'D'
+				and base_store_tb.STORE_USE_ST = 'Y'
+				and base_product_tb.STORE_ID = base_store_tb.STORE_ID
+		]]>
+		<isNotEmpty property="prod_use_pay_st"  prepend="AND">
+		<![CDATA[
+			base_product_tb.PROD_USE_PAY_ST = #prod_use_pay_st#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="store_category"  prepend="AND">
+		<![CDATA[
+			base_product_tb.STORE_CATEGORY = #store_category#
+		]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 상품등록 -->
+	<insert id="insert_product" parameterClass="AdmgrProductVO" >
+	<![CDATA[
+		insert into base_product_tb 
+			(
+				PROD_USE_ST, STORE_ID, 	STORE_NM, STORE_CATEGORY,
+				PROD_ID, PROD_NM, PROD_CATEGORY, PROD_CATEGORY_CD, PROD_COMMENT, PROD_CONTENT, PROD_CONTENT_2,
+				PROD_MARKET_PRICE, 	PROD_PRICE, PROD_PRICE_PERCENT, PROD_MIN_PRICE, PROD_ORDERBY, PROD_STOCK_SET, PROD_STOCK_CNT,
+				PROD_ST_DT, PROD_ED_DT,
+				PROD_HIT_CNT, 	PROD_PICK_CNT,
+				PROD_STAR, 	PROD_ORDER_CNT, PROD_USE_COUPON_ST, PROD_USE_MILEAGE_ST, PROD_USE_PAY_ST, PROD_RESERVE_LIMIT, PROD_BUNDLE_DELIVERY,
+				PROD_CONTENT_TIME, PROD_CONTENT_PAY, 	PROD_CONTENT_PRECAUTIONS, 	PROD_CONTENT_COURSE,
+				PROD_IMG_1, PROD_IMG_2, PROD_IMG_3, 	PROD_IMG_4, PROD_IMG_5, PROD_IMG_6, PROD_IMG_7, PROD_IMG_8, PROD_IMG_9, PROD_IMG_10,
+				PROD_MOVIE, PROD_MAKER, PROD_COUNTRY, 
+				REG_DT, MOD_DT, DEL_ST,
+				PROD_AGE, PROD_SEASON, PROD_TRAVEL_TYPE,
+				PROD_INFO_1, PROD_INFO_2, PROD_INFO_3, PROD_INFO_4, PROD_INFO_5,
+				PROD_INFO_6, PROD_INFO_7 , PROD_INFO_8, PROD_INFO_9, PROD_INFO_10,
+				PROD_INFO_11, PROD_INFO_12, PROD_INFO_13, PROD_INFO_14, PROD_INFO_15,
+				PROD_TRADE_INFO_1, PROD_TRADE_INFO_2, PROD_TRADE_INFO_3, PROD_TRADE_INFO_4, PROD_TRADE_INFO_5,
+				PROD_RECOM_1, PROD_RECOM_2, PROD_RECOM_3, PROD_RECOM_4, PROD_RECOM_5,
+				PROD_RECOM_6, PROD_RECOM_7, PROD_RECOM_8, PROD_RECOM_9, PROD_RECOM_10
+			) values (
+				#prod_use_st#, 	#store_id#, #store_nm#, #store_category#,
+				#prod_id#, #prod_nm#, #prod_category#, #prod_category_cd#, #prod_comment#, #prod_content#, #prod_content_2#,
+				#prod_market_price#, #prod_price#, #prod_price_percent#, #prod_min_price#, #prod_orderby#, 	#prod_stock_set#, #prod_stock_cnt#,
+				#prod_st_dt#, #prod_ed_dt#,
+				#prod_hit_cnt#, 	#prod_pick_cnt#,
+				#prod_star#, #prod_order_cnt#, #prod_use_coupon_st#, #prod_use_mileage_st#, 	#prod_use_pay_st#, #prod_reserve_limit#, #prod_bundle_delivery#,
+				#prod_content_time#, 	#prod_content_pay#, #prod_content_precautions#, #prod_content_course#,
+				#prod_img_1#, #prod_img_2#, #prod_img_3#, #prod_img_4#, #prod_img_5#, #prod_img_6#, #prod_img_7#, #prod_img_8#, #prod_img_9#, #prod_img_10#,
+				#prod_movie#, #prod_maker#, #prod_country#, 
+				now(), now(), 'N',
+				#prod_age#, #prod_season#, #prod_travel_type#,
+				#prod_info_1#, #prod_info_2#, #prod_info_3#, #prod_info_4#, #prod_info_5#,
+				#prod_info_6#, #prod_info_7#, #prod_info_8#, #prod_info_9#, #prod_info_10#,
+				#prod_info_11#, #prod_info_12#, #prod_info_13#, #prod_info_14#, #prod_info_15#,
+				#prod_trade_info_1#, #prod_trade_info_2#, #prod_trade_info_3#, #prod_trade_info_4#, #prod_trade_info_5#,
+				#prod_recom_1#, #prod_recom_2#, #prod_recom_3#, #prod_recom_4#, #prod_recom_5#,
+				#prod_recom_6#, #prod_recom_7#, #prod_recom_8#, #prod_recom_9#, #prod_recom_10#
+			)			
+	]]>
+		<selectKey type="post" keyProperty="insert_id" resultClass="int">
+			<![CDATA[
+			select LAST_INSERT_ID() as insert_id
+			]]>
+		</selectKey>
+	</insert>
+		
+	<!-- 상품수정 -->
+	<update id="update_product" parameterClass="AdmgrProductVO">
+	<![CDATA[
+		update base_product_tb set 
+			PROD_USE_ST = #prod_use_st#,
+			STORE_ID = #store_id#,
+			STORE_NM = #store_nm#,
+			STORE_CATEGORY = #store_category#,
+			PROD_NM = #prod_nm#,
+			PROD_CATEGORY = #prod_category#,
+			PROD_CATEGORY_CD = #prod_category_cd#,
+			PROD_COMMENT = #prod_comment#,
+			PROD_CONTENT = #prod_content#,
+			PROD_CONTENT_2 = #prod_content_2#,
+			PROD_MARKET_PRICE = #prod_market_price#,
+			PROD_PRICE = #prod_price#,
+			PROD_PRICE_PERCENT = #prod_price_percent#,
+			PROD_MIN_PRICE = #prod_min_price#,
+			PROD_ORDERBY = #prod_orderby#,
+			PROD_STOCK_SET = #prod_stock_set#,
+			PROD_STOCK_CNT = #prod_stock_cnt#,
+			PROD_ST_DT = #prod_st_dt#,
+			PROD_ED_DT = #prod_ed_dt#,
+			PROD_USE_COUPON_ST = #prod_use_coupon_st#,
+			PROD_USE_MILEAGE_ST = #prod_use_mileage_st#,
+			PROD_USE_PAY_ST = #prod_use_pay_st#,
+			PROD_RESERVE_LIMIT = #prod_reserve_limit#,
+			PROD_BUNDLE_DELIVERY = #prod_bundle_delivery#,
+			PROD_CONTENT_TIME = #prod_content_time#,
+			PROD_CONTENT_PAY = #prod_content_pay#,
+			PROD_CONTENT_PRECAUTIONS = #prod_content_precautions#,
+			PROD_CONTENT_COURSE = #prod_content_course#,
+			PROD_IMG_1 = #prod_img_1#,
+			PROD_IMG_2 = #prod_img_2#,
+			PROD_IMG_3 = #prod_img_3#,
+			PROD_IMG_4 = #prod_img_4#,
+			PROD_IMG_5 = #prod_img_5#,
+			PROD_IMG_6 = #prod_img_6#,
+			PROD_IMG_7 = #prod_img_7#,
+			PROD_IMG_8 = #prod_img_8#,
+			PROD_IMG_9 = #prod_img_9#,
+			PROD_IMG_10 = #prod_img_10#,
+			PROD_MOVIE = #prod_movie#,
+			PROD_MAKER = #prod_maker#,
+			PROD_COUNTRY = #prod_country#,
+			PROD_AGE = #prod_age#,
+			PROD_SEASON = #prod_season#,
+			PROD_TRAVEL_TYPE = #prod_travel_type#,
+			PROD_INFO_1 = #prod_info_1#,
+			PROD_INFO_2 = #prod_info_2#,
+			PROD_INFO_3 = #prod_info_3#,
+			PROD_INFO_4 = #prod_info_4#,
+			PROD_INFO_5 = #prod_info_5#,
+			PROD_INFO_6 = #prod_info_6#,
+			PROD_INFO_7 = #prod_info_7#,
+			PROD_INFO_8 = #prod_info_8#,
+			PROD_INFO_9 = #prod_info_9#,
+			PROD_INFO_10 = #prod_info_10#,
+			PROD_INFO_11 = #prod_info_11#,
+			PROD_INFO_12 = #prod_info_12#,
+			PROD_INFO_13 = #prod_info_13#,
+			PROD_INFO_14 = #prod_info_14#,
+			PROD_INFO_15 = #prod_info_15#,
+			PROD_TRADE_INFO_1 = #prod_trade_info_1#,
+			PROD_TRADE_INFO_2 = #prod_trade_info_2#,
+			PROD_TRADE_INFO_3 = #prod_trade_info_3#,
+			PROD_TRADE_INFO_4 = #prod_trade_info_4#,
+			PROD_TRADE_INFO_5 = #prod_trade_info_5#,
+		]]>
+		<isNotEmpty property="user_level">
+			<isEqual property="user_level" compareValue="10">
+			<![CDATA[
+			PROD_RECOM_1 = #prod_recom_1#,
+			PROD_RECOM_2 = #prod_recom_2#,
+			PROD_RECOM_3 = #prod_recom_3#,
+			PROD_RECOM_4 = #prod_recom_4#,
+			PROD_RECOM_5 = #prod_recom_5#,
+			PROD_RECOM_6 = #prod_recom_6#,
+			PROD_RECOM_7 = #prod_recom_7#,
+			PROD_RECOM_8 = #prod_recom_8#,
+			PROD_RECOM_9 = #prod_recom_9#,
+			PROD_RECOM_10 = #prod_recom_10#,
+			]]>
+			</isEqual>
+		</isNotEmpty>			
+		<![CDATA[
+			MOD_DT = now()
+		where
+			PROD_SEQ = #prod_seq#
+		]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = base_product_tb.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>
+	</update>
+		
+	<!-- 상품삭제 -->
+	<update id="delete_product" parameterClass="AdmgrProductVO">
+	<![CDATA[
+		update base_product_tb set 
+			DEL_ST = 'Y',
+			DEL_DT = now()
+		where
+			PROD_SEQ = #prod_seq#
+	]]>
+		<isNotEmpty property="user_id"  prepend="AND">
+		<![CDATA[
+			(SELECT USER_ID FROM base_store_tb WHERE base_store_tb.STORE_ID = base_product_tb.STORE_ID AND base_store_tb.STORE_USE_ST = 'Y') = #user_id#
+		]]>
+		</isNotEmpty>
+	</update>
+		
+	<select id="get_product_option" parameterClass="AdmgrProductVO" resultClass="AdmgrProductVO">
+		<![CDATA[
+			select 
+				OPT_SEQ, 
+				PROD_ID, 
+				OPT_ORDERBY,
+				OPT_NM, 
+				OPT_PRICE,
+				OPT_USE_ST, 
+				OPT_DEL_ST
+			from base_product_opt_tb
+			where
+				PROD_ID = #prod_id#
+				and OPT_DEL_ST = 'N'
+		]]>
+	</select>
+		
+	<insert id="insert_product_option"  parameterClass="AdmgrProductVO" >
+		<![CDATA[
+			insert into base_product_opt_tb
+				(
+					PROD_ID, OPT_ORDERBY,
+					OPT_NM, OPT_PRICE,
+					OPT_USE_ST, OPT_DEL_ST
+				) values (
+					#prod_id#, #opt_orderby#,
+					#opt_nm#, #opt_price#,
+					 #opt_use_st#, 'N'
+				) 
+		]]>
+	</insert>
+	
+	<update id="delete_product_option"  parameterClass="AdmgrProductVO" >
+		<![CDATA[
+			update  base_product_opt_tb set
+				OPT_DEL_ST = 'Y'
+			where 
+				PROD_ID = #prod_id# 
+		]]>
+	</update>	
+
+	<!-- 추천상품정보 간략호출 -->
+	<select id="get_recom_info" parameterClass="admgrProductVO" resultClass="admgrProductVO">
+		<![CDATA[
+			select
+				PROD_ID, 
+				PROD_NM,
+				STORE_NM,
+				PROD_IMG_1	,
+				PROD_USE_ST
+			from base_product_tb
+			where 1
+				and prod_use_st != 'N'
+				and prod_id = #prod_id# 
+		]]>
+	</select>	
+
+	<!-- 방 목록 -->
+	<select id="get_room_list" parameterClass="admgrProductVO" resultClass="admgrProductVO">
+	<![CDATA[
+		select 
+			PROD_ROOM_SEQ,
+			PROD_ROOM_USE_ST,
+			PROD_ID,
+			PROD_ROOM_NM,
+			PROD_ROOM_ORDERBY,
+			PROD_ROOM_CONTENT_1,
+			PROD_ROOM_CONTENT_2,
+			PROD_ROOM_IMG_1,
+			PROD_ROOM_IMG_2,
+			PROD_ROOM_IMG_3,
+			PROD_ROOM_IMG_4,
+			PROD_ROOM_IMG_5,
+			PROD_ROOM_IMG_6,
+			PROD_ROOM_IMG_7,
+			PROD_ROOM_IMG_8,
+			PROD_ROOM_IMG_9,
+			PROD_ROOM_IMG_10,
+			PROD_ROOM_MOVIE,
+			PROD_ROOM_DEFAULT_CNT,
+			PROD_ROOM_MAX_CNT,
+			PROD_ROOM_ADULT_PRICE,
+			PROD_ROOM_YOUNG_PRICE,
+			PROD_ROOM_NORMAL_NORMAL_PRICE,
+			PROD_ROOM_NORMAL_NORMAL_SALE_PRICE,
+			PROD_ROOM_NORMAL_HOLIDAY_PRICE,
+			PROD_ROOM_NORMAL_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_READY_NORMAL_PRICE,
+			PROD_ROOM_READY_NORMAL_SALE_PRICE,
+			PROD_ROOM_READY_HOLIDAY_PRICE,
+			PROD_ROOM_READY_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_READY2_NORMAL_PRICE,
+			PROD_ROOM_READY2_NORMAL_SALE_PRICE,
+			PROD_ROOM_READY2_HOLIDAY_PRICE,
+			PROD_ROOM_READY2_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_BUSY_NORMAL_PRICE,
+			PROD_ROOM_BUSY_NORMAL_SALE_PRICE,
+			PROD_ROOM_BUSY_HOLIDAY_PRICE,
+			PROD_ROOM_BUSY_HOLIDAY_SALE_PRICE,
+			DEL_ST
+		from base_product_room_tb
+		where 1
+			and DEL_ST = "N"
+			and PROD_ID = #prod_id#
+		order by PROD_ROOM_ORDERBY asc, PROD_ROOM_SEQ desc
+	]]>
+	</select>
+	
+	<!-- 방 정보 -->
+	<select id="get_room_info" parameterClass="admgrProductVO" resultClass="admgrProductVO">
+	<![CDATA[
+		select 
+			PROD_ROOM_SEQ,
+			PROD_ROOM_USE_ST,
+			PROD_ID,
+			PROD_ROOM_NM,
+			PROD_ROOM_ORDERBY,
+			PROD_ROOM_CONTENT_1,
+			PROD_ROOM_CONTENT_2,
+			PROD_ROOM_IMG_1,
+			PROD_ROOM_IMG_2,
+			PROD_ROOM_IMG_3,
+			PROD_ROOM_IMG_4,
+			PROD_ROOM_IMG_5,
+			PROD_ROOM_IMG_6,
+			PROD_ROOM_IMG_7,
+			PROD_ROOM_IMG_8,
+			PROD_ROOM_IMG_9,
+			PROD_ROOM_IMG_10,
+			PROD_ROOM_MOVIE,
+			PROD_ROOM_DEFAULT_CNT,
+			PROD_ROOM_MAX_CNT,
+			PROD_ROOM_ADULT_PRICE,
+			PROD_ROOM_YOUNG_PRICE,
+			PROD_ROOM_NORMAL_NORMAL_PRICE,
+			PROD_ROOM_NORMAL_NORMAL_SALE_PRICE,
+			PROD_ROOM_NORMAL_HOLIDAY_PRICE,
+			PROD_ROOM_NORMAL_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_READY_NORMAL_PRICE,
+			PROD_ROOM_READY_NORMAL_SALE_PRICE,
+			PROD_ROOM_READY_HOLIDAY_PRICE,
+			PROD_ROOM_READY_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_READY2_NORMAL_PRICE,
+			PROD_ROOM_READY2_NORMAL_SALE_PRICE,
+			PROD_ROOM_READY2_HOLIDAY_PRICE,
+			PROD_ROOM_READY2_HOLIDAY_SALE_PRICE,
+			PROD_ROOM_BUSY_NORMAL_PRICE,
+			PROD_ROOM_BUSY_NORMAL_SALE_PRICE,
+			PROD_ROOM_BUSY_HOLIDAY_PRICE,
+			PROD_ROOM_BUSY_HOLIDAY_SALE_PRICE,
+			DEL_ST
+		from base_product_room_tb
+		where 
+			DEL_ST = "N"
+			and PROD_ID = #prod_id#
+			and PROD_ROOM_SEQ = #prod_room_seq#
+	]]>
+	</select>
+	
+	<!-- 방 추가 -->
+	<insert id="insert_room" parameterClass="admgrProductVO" >
+	<![CDATA[
+		insert into base_product_room_tb
+			(
+			PROD_ROOM_USE_ST, PROD_ID, PROD_ROOM_NM, PROD_ROOM_ORDERBY, PROD_ROOM_CONTENT_1, PROD_ROOM_CONTENT_2,
+			PROD_ROOM_IMG_1, PROD_ROOM_IMG_2, PROD_ROOM_IMG_3, PROD_ROOM_IMG_4, PROD_ROOM_IMG_5,
+			PROD_ROOM_IMG_6, PROD_ROOM_IMG_7, PROD_ROOM_IMG_8, PROD_ROOM_IMG_9, PROD_ROOM_IMG_10,
+			PROD_ROOM_MOVIE, 
+			PROD_ROOM_DEFAULT_CNT, PROD_ROOM_MAX_CNT, PROD_ROOM_ADULT_PRICE, PROD_ROOM_YOUNG_PRICE,
+			PROD_ROOM_NORMAL_NORMAL_PRICE, PROD_ROOM_NORMAL_NORMAL_SALE_PRICE, PROD_ROOM_NORMAL_HOLIDAY_PRICE, PROD_ROOM_NORMAL_HOLIDAY_SALE_PRICE, 
+			PROD_ROOM_READY_NORMAL_PRICE, PROD_ROOM_READY_NORMAL_SALE_PRICE, PROD_ROOM_READY_HOLIDAY_PRICE, PROD_ROOM_READY_HOLIDAY_SALE_PRICE, 
+			PROD_ROOM_READY2_NORMAL_PRICE, PROD_ROOM_READY2_NORMAL_SALE_PRICE, PROD_ROOM_READY2_HOLIDAY_PRICE, PROD_ROOM_READY2_HOLIDAY_SALE_PRICE, 
+			PROD_ROOM_BUSY_NORMAL_PRICE, PROD_ROOM_BUSY_NORMAL_SALE_PRICE, PROD_ROOM_BUSY_HOLIDAY_PRICE, PROD_ROOM_BUSY_HOLIDAY_SALE_PRICE,
+			DEL_ST
+		) values (
+			#prod_room_use_st#, #prod_id#, #prod_room_nm#, #prod_room_orderby#, #prod_room_content_1#, #prod_room_content_2#,
+			#prod_room_img_1#, #prod_room_img_2#, #prod_room_img_3#, #prod_room_img_4#, #prod_room_img_5#,
+			#prod_room_img_6#, #prod_room_img_7#, #prod_room_img_8#, #prod_room_img_9#, #prod_room_img_10#,
+			#prod_room_movie#, 
+			#prod_room_default_cnt#, #prod_room_max_cnt#, #prod_room_adult_price#, #prod_room_young_price#,
+			#prod_room_normal_normal_price#, #prod_room_normal_normal_sale_price#, #prod_room_normal_holiday_price#, #prod_room_normal_holiday_sale_price#, 
+			#prod_room_ready_normal_price#, #prod_room_ready_normal_sale_price#, #prod_room_ready_holiday_price#, #prod_room_ready_holiday_sale_price#, 
+			#prod_room_ready2_normal_price#, #prod_room_ready2_normal_sale_price#, #prod_room_ready2_holiday_price#, #prod_room_ready2_holiday_sale_price#, 
+			#prod_room_busy_normal_price#, #prod_room_busy_normal_sale_price#, #prod_room_busy_holiday_price#, #prod_room_busy_holiday_sale_price#,
+			'N'
+		)
+	]]>
+	</insert>
+	
+	<!-- 방 수정 -->
+	<update id="update_room" parameterClass="admgrProductVO" >
+	<![CDATA[
+		update base_product_room_tb set
+			PROD_ROOM_USE_ST = #prod_room_use_st#,
+			PROD_ROOM_NM = #prod_room_nm#,
+			PROD_ROOM_ORDERBY = #prod_room_orderby#,
+			PROD_ROOM_CONTENT_1 = #prod_room_content_1#,
+			PROD_ROOM_CONTENT_2 = #prod_room_content_2#,
+			PROD_ROOM_IMG_1 = #prod_room_img_1#,
+			PROD_ROOM_IMG_2 = #prod_room_img_2#,
+			PROD_ROOM_IMG_3 = #prod_room_img_3#,
+			PROD_ROOM_IMG_4 = #prod_room_img_4#,
+			PROD_ROOM_IMG_5 = #prod_room_img_5#,
+			PROD_ROOM_IMG_6 = #prod_room_img_6#,
+			PROD_ROOM_IMG_7 = #prod_room_img_7#,
+			PROD_ROOM_IMG_8 = #prod_room_img_8#,
+			PROD_ROOM_IMG_9 = #prod_room_img_9#,
+			PROD_ROOM_IMG_10 = #prod_room_img_10#,
+			PROD_ROOM_MOVIE = #prod_room_movie#,
+			PROD_ROOM_DEFAULT_CNT = #prod_room_default_cnt#,
+			PROD_ROOM_MAX_CNT = #prod_room_max_cnt#,
+			PROD_ROOM_ADULT_PRICE = #prod_room_adult_price#,
+			PROD_ROOM_YOUNG_PRICE = #prod_room_young_price#,
+			PROD_ROOM_NORMAL_NORMAL_PRICE = #prod_room_normal_normal_price#,
+			PROD_ROOM_NORMAL_NORMAL_SALE_PRICE = #prod_room_normal_normal_sale_price#,
+			PROD_ROOM_NORMAL_HOLIDAY_PRICE = #prod_room_normal_holiday_price#,
+			PROD_ROOM_NORMAL_HOLIDAY_SALE_PRICE = #prod_room_normal_holiday_sale_price#,
+			PROD_ROOM_READY_NORMAL_PRICE = #prod_room_ready_normal_price#,
+			PROD_ROOM_READY_NORMAL_SALE_PRICE = #prod_room_ready_normal_sale_price#,
+			PROD_ROOM_READY_HOLIDAY_PRICE = #prod_room_ready_holiday_price#,
+			PROD_ROOM_READY_HOLIDAY_SALE_PRICE = #prod_room_ready_holiday_sale_price#,
+			PROD_ROOM_READY2_NORMAL_PRICE = #prod_room_ready2_normal_price#,
+			PROD_ROOM_READY2_NORMAL_SALE_PRICE = #prod_room_ready2_normal_sale_price#,
+			PROD_ROOM_READY2_HOLIDAY_PRICE = #prod_room_ready2_holiday_price#,
+			PROD_ROOM_READY2_HOLIDAY_SALE_PRICE = #prod_room_ready2_holiday_sale_price#,
+			PROD_ROOM_BUSY_NORMAL_PRICE = #prod_room_busy_normal_price#,
+			PROD_ROOM_BUSY_NORMAL_SALE_PRICE = #prod_room_busy_normal_sale_price#,
+			PROD_ROOM_BUSY_HOLIDAY_PRICE = #prod_room_busy_holiday_price#,
+			PROD_ROOM_BUSY_HOLIDAY_SALE_PRICE = #prod_room_busy_holiday_sale_price#
+		where 
+			DEL_ST = "N"
+			and PROD_ROOM_SEQ = #prod_room_seq#
+	]]>
+	</update>
+	
+	<!-- 방 삭제 -->
+	<update id="delete_room" parameterClass="admgrProductVO" >
+	<![CDATA[
+		update base_product_room_tb set
+			DEL_ST = 'Y'
+		where 
+			DEL_ST = "N"
+			and PROD_ROOM_SEQ = #prod_room_seq#
+	]]>
+	</update>
+	
+	<!-- 순서 조정 -->
+	<update id="product_orderby_update" parameterClass="admgrProductVO" >
+	<![CDATA[
+		update base_product_tb set
+			PROD_ORDERBY = #prod_orderby#,
+			PROD_USE_ST = #prod_use_st#,
+			PROD_USE_PAY_ST = #prod_use_pay_st#
+		where 
+			PROD_SEQ = #prod_seq#
+	]]>
+	</update>
+	
+	
+	<!-- 상점관리자용 상점목록 -->
+	<select id="get_id_store_list" parameterClass="admgrProductVO" resultClass="admgrProductVO" >
+	<![CDATA[
+		select 
+			STORE_ID,
+			STORE_NM
+		from base_store_tb
+		where 1
+			and USER_ID = #user_id#
+			and STORE_USE_ST = 'Y' 
+	]]>
+	</select>
+	
+	
+</sqlMap>

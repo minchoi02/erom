@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="admgrMarketing">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="AdmgrMarketingVO" type="egovframework.admgrMarketing.service.AdmgrMarketingVO"/>
+	
+	<!-- 슬라이드 목록 -->
+	<select id="get_slide_list" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				SLIDE_SEQ, 
+				SLIDE_SUBJECT, 
+				SLIDE_LINK, 
+				SLIDE_TARGET, 
+				substr(SLIDE_ST_DT,1,16) as SLIDE_ST_DT, 
+				substr(SLIDE_ST_DT,1,10) as SLIDE_ST_DT_YMD, 
+				substr(SLIDE_ST_DT,12,2) as SLIDE_ST_DT_HOUR, 
+				substr(SLIDE_ST_DT,15,2) as SLIDE_ST_DT_MINUTE, 
+				substr(SLIDE_ED_DT,1,16) as SLIDE_ED_DT, 
+				substr(SLIDE_ED_DT,1,10) as SLIDE_ED_DT_YMD, 
+				substr(SLIDE_ED_DT,12,2) as SLIDE_ED_DT_HOUR, 
+				substr(SLIDE_ED_DT,15,2) as SLIDE_ED_DT_MINUTE, 
+				SLIDE_USE_ST,
+				substr(REG_DT,1,19) as REG_DT, 
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS,
+				SLIDE_IMG 
+			from base_marketing_slide_tb
+			where 1 
+			and SLIDE_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			SLIDE_SUBJECT  like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+		order by SLIDE_ED_DT desc
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<!--슬라이드 목록 갯수  -->
+	<select id="get_slide_list_cnt" parameterClass="AdmgrMarketingVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_marketing_slide_tb 
+			where 1 
+			and SLIDE_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			SLIDE_SUBJECT  like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>	
+	</select>	
+
+	<!--슬라이드 정보  -->
+	<select id="get_slide_info" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				SLIDE_SEQ, 
+				SLIDE_SUBJECT, 
+				SLIDE_LINK, 
+				SLIDE_TARGET, 
+				substr(SLIDE_ST_DT,1,16) as SLIDE_ST_DT, 
+				substr(SLIDE_ST_DT,1,10) as SLIDE_ST_DT_YMD, 
+				substr(SLIDE_ST_DT,12,2) as SLIDE_ST_DT_HOUR, 
+				substr(SLIDE_ST_DT,15,2) as SLIDE_ST_DT_MINUTE, 
+				substr(SLIDE_ED_DT,1,16) as SLIDE_ED_DT, 
+				substr(SLIDE_ED_DT,1,10) as SLIDE_ED_DT_YMD, 
+				substr(SLIDE_ED_DT,12,2) as SLIDE_ED_DT_HOUR, 
+				substr(SLIDE_ED_DT,15,2) as SLIDE_ED_DT_MINUTE, 
+				SLIDE_USE_ST,
+				substr(REG_DT,1,19) as REG_DT,
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS,
+				SLIDE_IMG 
+			from base_marketing_slide_tb
+			where 1 
+			and SLIDE_USE_ST = 'Y'
+			and SLIDE_SEQ = #slide_seq#
+		]]>
+	</select>	
+		
+	<!-- 슬라이드등록 -->
+	<insert id="insert_slide" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			insert into base_marketing_slide_tb 
+				(SLIDE_SUBJECT, SLIDE_LINK, SLIDE_TARGET, SLIDE_ST_DT, SLIDE_ED_DT, SLIDE_IMG, SLIDE_USE_ST, REG_DT)
+			values
+				(#slide_subject#, #slide_link#, #slide_target#, #slide_st_dt#, #slide_ed_dt#, #slide_img#, #slide_use_st#, now())
+		]]>
+	</insert> 
+	<!-- 슬라이드수정 -->
+	<update id="update_slide" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_slide_tb set
+				SLIDE_SUBJECT = #slide_subject#,
+				SLIDE_LINK = #slide_link#,
+				SLIDE_TARGET = #slide_target#,
+		]]>
+			<isNotEmpty property="slide_img">
+			<![CDATA[
+				SLIDE_IMG = #slide_img#,
+			]]>
+			</isNotEmpty>
+		<![CDATA[				
+				SLIDE_ST_DT = #slide_st_dt#,
+				SLIDE_ED_DT = #slide_ed_dt#
+			where 
+				SLIDE_SEQ = #slide_seq#
+		]]>
+	</update> 
+	<!-- 슬라이드삭제 -->
+	<update id="delete_slide" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_slide_tb set SLIDE_USE_ST = 'N' where SLIDE_SEQ = #slide_seq#
+		]]>
+	</update> 
+	
+	<!--금주의 상품 목록 -->
+	<select id="get_week_list" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				base_marketing_week_tb.WEEK_SEQ, 
+				base_marketing_week_tb.STORE_CATEGORY, 
+				base_marketing_week_tb.PROD_ID, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,16) as WEEK_ST_DT, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,10) as WEEK_ST_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,12,2) as WEEK_ST_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,15,2) as WEEK_ST_DT_MINUTE, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,16) as WEEK_ED_DT, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,10) as WEEK_ED_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,12,2) as WEEK_ED_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,15,2) as WEEK_ED_DT_MINUTE, 
+				base_marketing_week_tb.WEEK_USE_ST,
+				substr(base_marketing_week_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_week_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_week_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_SEQ, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM
+			from base_marketing_week_tb LEFT JOIN base_product_tb 
+			ON base_marketing_week_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_week_tb.WEEK_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND">
+			<![CDATA[
+				base_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+		order by base_marketing_week_tb.WEEK_ED_DT desc
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<!--금주의 상품 목록 갯수 -->
+	<select id="get_week_list_cnt" parameterClass="AdmgrMarketingVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_marketing_week_tb LEFT JOIN base_product_tb 
+			ON base_marketing_week_tb.PROD_ID= base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_week_tb.WEEK_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND">
+			<![CDATA[
+				base_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>	
+	
+	<!--금주의 상품 정보  -->
+	<select id="get_week_info" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				base_marketing_week_tb.WEEK_SEQ, 
+				base_marketing_week_tb.STORE_CATEGORY, 
+				base_marketing_week_tb.PROD_ID, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,16) as WEEK_ST_DT, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,1,10) as WEEK_ST_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,12,2) as WEEK_ST_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ST_DT,15,2) as WEEK_ST_DT_MINUTE, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,16) as WEEK_ED_DT, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,1,10) as WEEK_ED_DT_YMD, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,12,2) as WEEK_ED_DT_HOUR, 
+				substr(base_marketing_week_tb.WEEK_ED_DT,15,2) as WEEK_ED_DT_MINUTE, 
+				base_marketing_week_tb.WEEK_USE_ST,
+				substr(base_marketing_week_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_week_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_week_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_ID, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM
+			from base_marketing_week_tb LEFT JOIN base_product_tb 
+			ON base_marketing_week_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_week_tb.WEEK_USE_ST = 'Y'
+			and base_marketing_week_tb.WEEK_SEQ = #week_seq#
+		]]>
+	</select>	
+
+
+	<!-- 금주의 상품 등록 -->
+	<insert id="insert_week">
+<![CDATA[
+			insert into base_marketing_week_tb 
+				(STORE_CATEGORY, PROD_ID, WEEK_ST_DT, WEEK_ED_DT, WEEK_USE_ST, REG_DT)
+			values
+				(#store_category#, #prod_id#, #week_st_dt#, #week_ed_dt#,  #week_use_st#, now())
+		]]>
+</insert> 
+	<!-- 금주의 상품 수정 -->
+	<update id="update_week" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_week_tb set
+				STORE_CATEGORY = #store_category#,
+				PROD_ID = #prod_id#,
+				WEEK_ST_DT = #week_st_dt#,
+				WEEK_ED_DT = #week_ed_dt#
+			where 
+				WEEK_SEQ = #week_seq#
+		]]>
+	</update> 
+	<!-- 금주의 상품 삭제 -->
+	<update id="delete_week" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_week_tb set WEEK_USE_ST = 'N' where WEEK_SEQ = #week_seq#
+		]]>
+	</update> 
+	
+
+	<!--배너 목록 -->
+	<select id="get_banner_list" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				BANNER_SEQ, 
+				BANNER_ZONE_1, 
+				BANNER_ZONE_2, 
+				BANNER_ZONE_3, 
+				BANNER_SUBJECT, 
+				BANNER_LINK, 
+				BANNER_TARGET, 
+				substr(BANNER_ST_DT,1,16) as BANNER_ST_DT, 
+				substr(BANNER_ST_DT,1,10) as BANNER_ST_DT_YMD, 
+				substr(BANNER_ST_DT,12,2) as BANNER_ST_DT_HOUR, 
+				substr(BANNER_ST_DT,15,2) as BANNER_ST_DT_MINUTE, 
+				substr(BANNER_ED_DT,1,16) as BANNER_ED_DT, 
+				substr(BANNER_ED_DT,1,10) as BANNER_ED_DT_YMD, 
+				substr(BANNER_ED_DT,12,2) as BANNER_ED_DT_HOUR, 
+				substr(BANNER_ED_DT,15,2) as BANNER_ED_DT_MINUTE, 
+				BANNER_USE_ST,
+				BANNER_IMG,
+				substr(REG_DT,1,19) as REG_DT,
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS
+			from base_marketing_banner_tb
+			where 1 
+			and BANNER_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND">
+			<![CDATA[
+				base_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="zone">
+			<isEqual prepend="AND" property="zone" compareValue="1">
+			<![CDATA[
+				BANNER_ZONE_1 = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="zone" compareValue="2">
+			<![CDATA[
+				BANNER_ZONE_2 = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="zone" compareValue="3">
+			<![CDATA[
+				BANNER_ZONE_3 = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			BANNER_SUBJECT  like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>
+		<![CDATA[
+		order by BANNER_ED_DT desc, REG_DT DESC
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<!--배너 목록 갯수 -->
+	<select id="get_banner_list_cnt" parameterClass="AdmgrMarketingVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_marketing_banner_tb 
+			where 1 
+			and BANNER_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND">
+			<![CDATA[
+				base_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="zone">
+			<isEqual prepend="AND" property="zone" compareValue="1">
+			<![CDATA[
+				BANNER_ZONE_1 = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="zone" compareValue="2">
+			<![CDATA[
+				BANNER_ZONE_2 = 'Y'
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="zone" compareValue="3">
+			<![CDATA[
+				BANNER_ZONE_3 = 'Y'
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword"  prepend="AND">
+		<![CDATA[
+			BANNER_SUBJECT like CONCAT('%',#searchKeyword#,'%')
+		]]>
+		</isNotEmpty>	
+	</select>	
+	
+	<!--금주의 상품 정보  -->
+	<select id="get_banner_info" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				BANNER_SEQ, 
+				BANNER_ZONE_1, 
+				BANNER_ZONE_2, 
+				BANNER_ZONE_3, 
+				BANNER_SUBJECT, 
+				BANNER_LINK, 
+				BANNER_TARGET, 
+				substr(BANNER_ST_DT,1,16) as BANNER_ST_DT, 
+				substr(BANNER_ST_DT,1,10) as BANNER_ST_DT_YMD, 
+				substr(BANNER_ST_DT,12,2) as BANNER_ST_DT_HOUR, 
+				substr(BANNER_ST_DT,15,2) as BANNER_ST_DT_MINUTE, 
+				substr(BANNER_ED_DT,1,16) as BANNER_ED_DT, 
+				substr(BANNER_ED_DT,1,10) as BANNER_ED_DT_YMD, 
+				substr(BANNER_ED_DT,12,2) as BANNER_ED_DT_HOUR, 
+				substr(BANNER_ED_DT,15,2) as BANNER_ED_DT_MINUTE, 
+				BANNER_USE_ST,
+				substr(REG_DT,1,19) as REG_DT,
+				substr(REG_DT,1,10) as REG_DT_YMD, 
+				substr(REG_DT,12,8) as REG_DT_HIS,
+				BANNER_IMG 
+			from base_marketing_banner_tb
+			where 1 
+			and BANNER_USE_ST = 'Y'
+			and BANNER_SEQ = #banner_seq#
+		]]>
+	</select>	
+
+	<!-- 배너 등록 -->
+	<insert id="insert_banner" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			insert into base_marketing_banner_tb 
+				(BANNER_ZONE_1, BANNER_ZONE_2, BANNER_ZONE_3, BANNER_SUBJECT, BANNER_LINK,  BANNER_TARGET, BANNER_ST_DT, BANNER_ED_DT, BANNER_IMG, BANNER_USE_ST, REG_DT)
+			values
+				(#banner_zone_1#, #banner_zone_2#, #banner_zone_3#, #banner_subject#, #banner_link#, #banner_target#, #banner_st_dt#,  #banner_ed_dt#,  #banner_img#,  #banner_use_st#, now())
+		]]>
+	</insert> 
+	<!-- 배너 수정 -->
+	<update id="update_banner" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_banner_tb set
+				BANNER_ZONE_1 = #banner_zone_1#,
+				BANNER_ZONE_2 = #banner_zone_2#,
+				BANNER_ZONE_3 = #banner_zone_3#,
+				BANNER_SUBJECT = #banner_subject#,
+				BANNER_LINK = #banner_link#,
+				BANNER_TARGET = #banner_target#,
+		]]>
+			<isNotEmpty property="banner_img">
+			<![CDATA[
+				BANNER_IMG = #banner_img#,
+			]]>
+			</isNotEmpty>
+		<![CDATA[
+				BANNER_ST_DT = #banner_st_dt#,
+				BANNER_ED_DT = #banner_ed_dt#
+			where BANNER_SEQ = #banner_seq#
+		]]>
+	</update> 
+	<!-- 배너 삭제 -->
+	<update id="delete_banner" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_banner_tb set BANNER_USE_ST = 'N' where BANNER_SEQ = #banner_seq#
+		]]>
+	</update> 
+	
+
+	<!-- 메인 상품 목록 -->
+	<select id="get_main_list" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+		<![CDATA[
+			select 
+				base_marketing_main_product_tb.MAIN_SEQ, 
+				base_marketing_main_product_tb.STORE_CATEGORY, 
+				base_marketing_main_product_tb.PROD_ID, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,16) as MAIN_ST_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,10) as MAIN_ST_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,12,2) as MAIN_ST_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,15,2) as MAIN_ST_DT_MINUTE, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,16) as MAIN_ED_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,10) as MAIN_ED_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,12,2) as MAIN_ED_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,15,2) as MAIN_ED_DT_MINUTE, 
+				base_marketing_main_product_tb.MAIN_USE_ST,
+				substr(base_marketing_main_product_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_main_product_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_main_product_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_SEQ, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM
+			from base_marketing_main_product_tb LEFT JOIN base_product_tb 
+			ON base_marketing_main_product_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_main_product_tb.MAIN_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND" >
+			<![CDATA[
+				base_marketing_main_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+		<![CDATA[
+		order by base_marketing_main_product_tb.MAIN_ED_DT desc
+		LIMIT #recordCountPerPage# OFFSET #firstIndex#
+		]]>
+	</select>
+
+	<!-- 메인 상품 목록 -->
+	<select id="get_main_list_cnt" parameterClass="AdmgrMarketingVO" resultClass="int">
+		<![CDATA[
+			select 
+				count(*) 
+			from base_marketing_main_product_tb LEFT JOIN base_product_tb 
+			ON base_marketing_main_product_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_main_product_tb.MAIN_USE_ST = 'Y'
+		]]>
+		<isNotEmpty property="store_category" prepend="AND" >
+			<![CDATA[
+				base_marketing_main_product_tb.STORE_CATEGORY = #store_category#
+			]]>
+		</isNotEmpty>
+		<isNotEmpty property="searchKeyword">
+			<isEqual prepend="AND" property="searchKey" compareValue="prod_nm">
+			<![CDATA[
+				base_product_tb.PROD_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+			<isEqual prepend="AND" property="searchKey" compareValue="store_nm">
+			<![CDATA[
+				base_product_tb.STORE_NM like CONCAT('%',#searchKeyword#,'%')
+			]]>
+			</isEqual>
+		</isNotEmpty>
+	</select>	
+	
+	<!--메인 상품 정보  -->
+	<select id="get_main_info" parameterClass="AdmgrMarketingVO" resultClass="AdmgrMarketingVO">
+<![CDATA[
+			select 
+				base_marketing_main_product_tb.MAIN_SEQ, 
+				base_marketing_main_product_tb.STORE_CATEGORY, 
+				base_marketing_main_product_tb.PROD_ID, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,16) as MAIN_ST_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,1,10) as MAIN_ST_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,12,2) as MAIN_ST_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ST_DT,15,2) as MAIN_ST_DT_MINUTE, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,16) as MAIN_ED_DT, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,1,10) as MAIN_ED_DT_YMD, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,12,2) as MAIN_ED_DT_HOUR, 
+				substr(base_marketing_main_product_tb.MAIN_ED_DT,15,2) as MAIN_ED_DT_MINUTE, 
+				base_marketing_main_product_tb.MAIN_USE_ST,
+				substr(base_marketing_main_product_tb.REG_DT,1,19) as REG_DT, 
+				substr(base_marketing_main_product_tb.REG_DT,1,10) as REG_DT_YMD, 
+				substr(base_marketing_main_product_tb.REG_DT,12,8) as REG_DT_HIS, 
+				base_product_tb.PROD_SEQ, 
+				base_product_tb.PROD_NM,
+				base_product_tb.STORE_NM,
+				base_product_tb.PROD_IMG_1,
+				(select BASE_CD_NM from base_code_cd_tb where base_code_cd_tb.BASE_CD = base_product_tb.store_category) as STORE_CATEGORY_NM
+			from base_marketing_main_product_tb LEFT JOIN base_product_tb 
+			ON base_marketing_main_product_tb.PROD_ID = base_product_tb.PROD_ID
+			where 1 
+			and base_marketing_main_product_tb.MAIN_USE_ST = 'Y'
+			and base_marketing_main_product_tb.MAIN_SEQ = #main_seq#
+		]]>
+</select>	
+
+	<!-- 메인 상품 등록 -->
+	<insert id="insert_main" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			insert into base_marketing_main_product_tb 
+				(STORE_CATEGORY, PROD_ID, MAIN_ST_DT, MAIN_ED_DT, MAIN_USE_ST, REG_DT)
+			values
+				(#store_category#, #prod_id#, #main_st_dt#, #main_ed_dt#, #main_use_st#, now())
+		]]>
+	</insert> 
+	<!-- 메인 상품 수정 -->
+	<update id="update_main" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_main_product_tb set
+				STORE_CATEGORY = #store_category#,
+				PROD_ID = #prod_id#,
+				MAIN_ST_DT = #main_st_dt#,
+				MAIN_ED_DT = #main_ed_dt#
+			where 
+				MAIN_SEQ = #main_seq#
+		]]>
+	</update> 
+	<!-- 메인 상품 삭제 -->
+	<update id="delete_main" parameterClass="AdmgrMarketingVO">
+		<![CDATA[
+			update base_marketing_main_product_tb set MAIN_USE_ST = 'N' where MAIN_SEQ = #main_seq#
+		]]>
+	</update> 
+	
+	
+</sqlMap>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseOrder">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="BaseOrderVO" type="egovframework.base.order.service.BaseOrderVO"/>
+
+	<!--
+	<resultMap id="order_prod" class="egovframework.base.order.service.BaseOrderVO">
+		<result property="keyword" column="KEYWORDS" columnIndex="1"/>
+		<result property="hitcnt" column="HIT_CNT" columnIndex="2"/>
+	</resultMap>
+
+	<select id="get_order_prod" parameterClass="BaseOrderVO" resultMap="order_prod">
+		select KEYWORDS,  HIT_CNT  from base_log_keyword_hit_tb  
+	</select>
+	-->
+	
+</sqlMap>
